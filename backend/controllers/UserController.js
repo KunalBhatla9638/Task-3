@@ -186,7 +186,9 @@ const loginUser = async (req, res) => {
           return res.status(404).json({ error: "Token error" });
         }
 
-        res.status(200).json({ status: "success", authToken });
+        res
+          .status(200)
+          .json({ status: "success", id: checkUser.id, authToken });
       }
     );
   } catch (err) {

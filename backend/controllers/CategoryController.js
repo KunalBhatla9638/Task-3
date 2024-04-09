@@ -1,5 +1,7 @@
 const listCategory = (req, res) => {
-  res.send("This is the list items");
+  try {
+    console.log(req.obj);
+  } catch (err) {}
 };
 
 module.exports = {

@@ -10,6 +10,7 @@ const verifyToken = (req, res, next) => {
     if (err) {
       return res.status(400).json({ error: "token not valid" });
     }
+    req.obj = verification;
     next();
   });
 };
