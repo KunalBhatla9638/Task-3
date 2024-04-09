@@ -3,10 +3,7 @@ const { QueryTypes } = require("sequelize");
 const Joi = require("joi");
 const fs = require("fs");
 const jwt = require("jsonwebtoken");
-
-//Validator
 const { hashPassword, comparePassword } = require("../helper/SecurePassword");
-const { error } = require("console");
 
 const welcome = (req, res) => {
   res.send("hello");
@@ -14,17 +11,18 @@ const welcome = (req, res) => {
 
 const addUser = async (req, res) => {
   const removePPicIfErr = () => {
-    fs.unlink(`./public/assets/${req.file.filename}`, (err, succ) => {
+    fs.unlink(`./public/assets/${req.file?.filename}`, (err, succ) => {
       if (err) {
         console.log("Error" + err.message);
       }
     });
   };
+  console.log(req.body);
+  console.log(req.file.filename);
+
   try {
     const { firstname, lastname, email, password, gender, hobbies, userRole } =
       req.body;
-
-    console.log(req.body);
 
     const profile_pic = req.file.filename;
     // const profile_pic = "Static";
@@ -122,23 +120,11 @@ const addUser = async (req, res) => {
     if (userCreated == undefined) {
       res.status(400).json({ error: "Error while creating the user" });
     }
-
-    // if (!res.status == 200) {
-    //   fs.unlink(
-    //     path.join(__dirname + "public/assets" + `/${profile_pic}`),
-
-    //     (error) => {
-    //       console.log(error);
-    //     }
-    //   );
-    // }
-
     res
       .status(200)
       .json({ success: true, message: "User registered successfully" });
   } catch (err) {
     removePPicIfErr();
-
     res.status(500).json({ error: "Internal server error" });
   }
 };

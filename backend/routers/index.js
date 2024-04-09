@@ -12,20 +12,46 @@ const {
 } = require("../controllers/UserController");
 
 //Category Controllers
-const { listCategory } = require("../controllers/CategoryController");
+const {
+  listCategory,
+  addCategory,
+  updateCategory,
+  deleteCategory,
+} = require("../controllers/CategoryController");
+
+//Products Controllers
+const {
+  listProducts,
+  addProducts,
+} = require("../controllers/ProductControllers");
 
 // uploadPhoto --Middleware--
 const uploadPhoto = require("../middleware/uploadPhoto");
 // authentication --Middleware
 const { verifyToken } = require("../middleware/authentication");
 
+//Welcome Route
 router.get("/", welcome);
-
 //Role Route
 router.post("/role", AddRole);
-// router.post("/addUser", addUser);
+
+//User common Route
 router.post("/addUser", uploadPhoto.single("profileImage"), addUser);
 router.post("/login", loginUser);
+
+//Category Route
 router.get("/list", verifyToken, listCategory);
+router.post("/addCategory", verifyToken, addCategory);
+router.patch("/updateCategory/:id", verifyToken, updateCategory);
+router.delete("/deleteCategory/:id", verifyToken, deleteCategory);
+
+// Products Route
+router.get("/products", verifyToken, listProducts);
+router.post(
+  "/addProducts",
+  uploadPhoto.array("productImages", 12),
+  verifyToken,
+  addProducts
+);
 
 module.exports = router;

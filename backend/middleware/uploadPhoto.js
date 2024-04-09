@@ -1,14 +1,19 @@
 const multer = require("multer");
+const fs = require("fs");
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    console.log("Destination");
-    cb(null, "public/assets");
+    const dir = "public/assets";
+
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir);
+    }
+
+    cb(null, dir);
   },
   filename: (req, file, cb) => {
     const renamed = Date.now() + "-" + file.originalname;
     cb(null, renamed);
-    console.log(file);
   },
 });
 
