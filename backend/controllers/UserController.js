@@ -1,18 +1,30 @@
 const sequelize = require("../utiles/database");
 const { QueryTypes } = require("sequelize");
 const Joi = require("joi");
+const fs = require("fs");
+const jwt = require("jsonwebtoken");
 
 //Validator
-const { hashPassword } = require("../helper/SecurePassword");
+const { hashPassword, comparePassword } = require("../helper/SecurePassword");
+const { error } = require("console");
 
 const welcome = (req, res) => {
   res.send("hello");
 };
 
 const addUser = async (req, res) => {
+  const removePPicIfErr = () => {
+    fs.unlink(`./public/assets/${req.file.filename}`, (err, succ) => {
+      if (err) {
+        console.log("Error" + err.message);
+      }
+    });
+  };
   try {
     const { firstname, lastname, email, password, gender, hobbies, userRole } =
       req.body;
+
+    console.log(req.body);
 
     const profile_pic = req.file.filename;
     // const profile_pic = "Static";
@@ -31,7 +43,7 @@ const addUser = async (req, res) => {
       return res.status(400).json({ error: "Email cannot be empty" });
     }
 
-    if (!uemail.endsWith("@gmail.com" || "@email.com" || "@yahoo.com")) {
+    if (!email.endsWith("@gmail.com" || "@email.com" || "@yahoo.com")) {
       return res
         .status(550)
         .json({ Error: "User Unknown - Email must be from example.com" });
@@ -66,18 +78,27 @@ const addUser = async (req, res) => {
     );
 
     if (checkEmail.length != 0) {
+      removePPicIfErr();
+      //
       return res.status(409).json({ error: "Email already exist" });
     }
 
     //One Admin only
     if (userRole == 1) {
-      const adminUser = sequelize.query(
-        `select * from users where userRole = 1`
+      const [adminUser] = await sequelize.query(
+        `select email from users where userRole = 1`,
+        {
+          type: QueryTypes.SELECT,
+        }
       );
-      if (adminUser != 0) {
+
+      if (adminUser) {
+        console.log(adminUser);
         return res.status(409).json({ error: "Admin already exist" });
       }
     }
+
+    console.log(__dirname + "public/assets" + `/${profile_pic}`);
 
     //insertData
     const securePassword = await hashPassword(password);
@@ -101,15 +122,80 @@ const addUser = async (req, res) => {
     if (userCreated == undefined) {
       res.status(400).json({ error: "Error while creating the user" });
     }
+
+    // if (!res.status == 200) {
+    //   fs.unlink(
+    //     path.join(__dirname + "public/assets" + `/${profile_pic}`),
+
+    //     (error) => {
+    //       console.log(error);
+    //     }
+    //   );
+    // }
+
     res
       .status(200)
       .json({ success: true, message: "User registered successfully" });
   } catch (err) {
+    removePPicIfErr();
+
     res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+const loginUser = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ error: "Email cannot be empty" });
+    }
+    if (!email.endsWith("@gmail.com" || "@email.com" || "@yahoo.com")) {
+      return res
+        .status(550)
+        .json({ Error: "User Unknown - Email must be from example.com" });
+    }
+    if (!password) {
+      return res.status(400).json({ error: "Password cannot be empty" });
+    }
+
+    const [checkUser] = await sequelize.query(
+      "select * from users where email = ?",
+      {
+        type: QueryTypes.SELECT,
+        replacements: [email],
+      }
+    );
+
+    if (checkUser == undefined) {
+      return res.status(404).json({ error: "Email does not exist" });
+    }
+
+    const comparePass = await comparePassword(password, checkUser.password);
+
+    if (!comparePass) {
+      return res.status(404).json({ error: "Enter the correct credentails" });
+    }
+
+    jwt.sign(
+      checkUser,
+      process.env.SECUREKEY,
+      { expiresIn: "1h" },
+      (err, authToken) => {
+        if (err) {
+          return res.status(404).json({ error: "Token error" });
+        }
+
+        res.status(200).json({ status: "success", authToken });
+      }
+    );
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 };
 
 module.exports = {
   welcome,
   addUser,
+  loginUser,
 };
