@@ -134,11 +134,12 @@ const addProducts = async (req, res) => {
   }
 };
 
+//Image issue it not remain same if you don't want to add the images
 const updateProducts = async (req, res) => {
   try {
     const productId = req.params.id;
     const { categoryName, description, categoryId, price } = req.body;
-    const { userRole, id } = req.obj;
+    const { userRole, id, firstname } = req.obj;
 
     const productImages = [];
     req.files.forEach((file) => {
@@ -177,20 +178,89 @@ const updateProducts = async (req, res) => {
     }
 
     const updateProduct = await sequelize.query(
-      `UPDATE "products" SET "name" = ?, "description" = ?, "categoryId" = ?, "price" = ?, "images" = ? WHERE "products"."id" = ?`,
+      `UPDATE products SET name = ?, description = ?, categoryId = ?, price = ?, images = ? WHERE products.id = ?`,
       {
         type: QueryTypes.UPDATE,
         replacements: [
-          categoryName,
-          description,
-          categoryId,
-          price,
-          JSON.stringify(productImages) || "Random",
+          categoryName || checkProduct.name,
+          description || checkProduct.description,
+          categoryId || checkProduct.categoryId,
+          price || checkProduct.price,
+          JSON.stringify(productImages) || checkProduct.images,
+          productId,
         ],
       }
     );
+
+    if (!updateProduct) {
+      return res
+        .status(400)
+        .json({ error: "Error while updating the product" });
+    }
+
+    res.status(200).json({ status: "success" });
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+};
+
+const deleteProducts = async (req, res) => {
+  try {
+    const productId = req.params.id;
+    const { userRole, id, firstname } = req.obj;
+
+    const [checkProduct] = await sequelize.query(
+      "select * from products where id = ?",
+      {
+        type: QueryTypes.SELECT,
+        replacements: [productId],
+      }
+    );
+    if (checkProduct == undefined) {
+      return res.status(404).json({ error: "Product not found to delete" });
+    }
+
+    const [categoryDetail] = await sequelize.query(
+      "select * from categories where id = ?",
+      {
+        type: QueryTypes.SELECT,
+        replacements: [checkProduct.categoryId],
+      }
+    );
+    if (categoryDetail == undefined) {
+      return res.status(404).json({ error: "No category found....!" });
+    }
+
+    if (userRole != 1) {
+      if (id != categoryDetail.createdBy) {
+        return res.status(400).json({
+          error: `Category does not belong's to you Mr.${firstname} you cannot delete the product`,
+        });
+      }
+    }
+
+    const deleteProduct = sequelize.query(
+      "DELETE FROM `products` WHERE `products`.`id` = ?",
+      {
+        type: QueryTypes.DELETE,
+        replacements: [productId],
+      }
+    );
+
+    if (!deleteProduct) {
+      return res.status(400).json({
+        error: `Error while deleting the product id : '${productId}'`,
+      });
+    }
+
+    res.status(200).json({
+      status: "success",
+      msg: `Deleted product id '${productId}' successfully`,
+    });
+  } catch (err) {
+    return res
+      .status(500)
+      .json({ error: "Internal server error", msg: err.messsage });
   }
 };
 
@@ -198,4 +268,5 @@ module.exports = {
   listProducts,
   addProducts,
   updateProducts,
+  deleteProducts,
 };

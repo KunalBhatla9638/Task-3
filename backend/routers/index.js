@@ -24,6 +24,7 @@ const {
   listProducts,
   addProducts,
   updateProducts,
+  deleteProducts,
 } = require("../controllers/ProductControllers");
 
 // uploadPhoto --Middleware--
@@ -60,5 +61,6 @@ router.patch(
   verifyToken,
   updateProducts
 );
+router.delete("/deleteProduct/:id", verifyToken, deleteProducts);
 
 module.exports = router;
