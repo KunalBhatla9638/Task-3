@@ -1,0 +1,5 @@
+.wrapper {
+  text-align: center;
+  width: calc(100% - 30%);
+  margin: 0 auto;
+}

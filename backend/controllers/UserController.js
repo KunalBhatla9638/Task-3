@@ -21,7 +21,7 @@ const addUser = async (req, res) => {
   try {
     const { firstname, lastname, email, password, gender, hobbies, userRole } =
       req.body;
-    const profile_pic = req.file.filename;
+    const profile_pic = req.file?.filename;
 
     // const profile_pic = "Static";
 
@@ -39,8 +39,8 @@ const addUser = async (req, res) => {
 
     if (!email.endsWith("@gmail.com" || "@email.com" || "@yahoo.com")) {
       return res
-        .status(550)
-        .json({ Error: "User Unknown - Email must be from example.com" });
+        .status(500)
+        .json({ error: "User Unknown - Email must be from example.com" });
     }
 
     if (!password) {
@@ -113,7 +113,7 @@ const addUser = async (req, res) => {
       res.status(400).json({ error: "Error while creating the user" });
     }
     res
-      .status(200)
+      .status(201)
       .json({ success: true, message: "User registered successfully" });
   } catch (err) {
     removePPicIfErr();
@@ -131,7 +131,7 @@ const loginUser = async (req, res) => {
     if (!email.endsWith("@gmail.com" || "@email.com" || "@yahoo.com")) {
       return res
         .status(550)
-        .json({ Error: "User Unknown - Email must be from example.com" });
+        .json({ error: "User Unknown - Email must be from example.com" });
     }
     if (!password) {
       return res.status(400).json({ error: "Password cannot be empty" });
