@@ -1,6 +1,6 @@
 const sequelize = require("../utiles/database");
 const { QueryTypes } = require("sequelize");
-const Joi = require("joi");
+// const Joi = require("joi");
 const fs = require("fs");
 const jwt = require("jsonwebtoken");
 const { hashPassword, comparePassword } = require("../helper/SecurePassword");
@@ -17,17 +17,13 @@ const addUser = async (req, res) => {
       }
     });
   };
-  console.log(req.body);
-  console.log(req.file.filename);
 
   try {
     const { firstname, lastname, email, password, gender, hobbies, userRole } =
       req.body;
-
     const profile_pic = req.file.filename;
-    // const profile_pic = "Static";
 
-    console.log(firstname + profile_pic);
+    // const profile_pic = "Static";
 
     if (!firstname) {
       return res.status(400).json({ error: "Firstname cannot be empty" });
@@ -59,10 +55,6 @@ const addUser = async (req, res) => {
       return res.status(400).json({ error: "Hobbies cannot be empty" });
     }
 
-    // if (!userRole) {
-    //   return res.status(400).json({ error: "UserRole cannot be empty" });
-    // }
-
     if (!profile_pic) {
       return res.status(400).json({ error: "Profile picture cannot be empty" });
     }
@@ -91,12 +83,12 @@ const addUser = async (req, res) => {
       );
 
       if (adminUser) {
-        console.log(adminUser);
+        // console.log(adminUser);
         return res.status(409).json({ error: "Admin already exist" });
       }
     }
 
-    console.log(__dirname + "public/assets" + `/${profile_pic}`);
+    // console.log(__dirname + "public/assets" + `/${profile_pic}`);
 
     //insertData
     const securePassword = await hashPassword(password);
@@ -125,7 +117,7 @@ const addUser = async (req, res) => {
       .json({ success: true, message: "User registered successfully" });
   } catch (err) {
     removePPicIfErr();
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ error: "Internal server error", msg: err.message });
   }
 };
 

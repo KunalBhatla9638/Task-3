@@ -23,6 +23,7 @@ const {
 const {
   listProducts,
   addProducts,
+  updateProducts,
 } = require("../controllers/ProductControllers");
 
 // uploadPhoto --Middleware--
@@ -52,6 +53,12 @@ router.post(
   uploadPhoto.array("productImages", 12),
   verifyToken,
   addProducts
+);
+router.patch(
+  "/updateProduct/:id",
+  uploadPhoto.array("productImages", 12),
+  verifyToken,
+  updateProducts
 );
 
 module.exports = router;

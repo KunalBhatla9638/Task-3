@@ -1,8 +1,20 @@
 const { QueryTypes } = require("sequelize");
 const sequelize = require("../utiles/database");
 
-const listProducts = (req, res) => {
-  res.send("List all products");
+const listProducts = async (req, res) => {
+  try {
+    const data = await sequelize.query("select * from products", {
+      type: QueryTypes.SELECT,
+    });
+
+    if (data.length == 0) {
+      return res.status(204).json({ error: "Nothing to show....!" });
+    }
+
+    res.status(200).json({ status: "success", data });
+  } catch (err) {
+    res.status(500).json({ error: "Internal server error", msg: err.message });
+  }
 };
 
 const addProducts = async (req, res) => {
@@ -15,7 +27,7 @@ const addProducts = async (req, res) => {
     productImages.push(file.originalname);
   });
 
-  if (!categoryName || categoryName.trim() === "") {
+  if (!categoryName) {
     return res.status(400).json({
       message: "Name is required",
     });
@@ -57,6 +69,7 @@ const addProducts = async (req, res) => {
         replacements: [categoryName],
       }
     );
+
     if (nameExist.length != 0) {
       return res.status(409).json({ error: "Name already in use" });
     }
@@ -121,7 +134,68 @@ const addProducts = async (req, res) => {
   }
 };
 
+const updateProducts = async (req, res) => {
+  try {
+    const productId = req.params.id;
+    const { categoryName, description, categoryId, price } = req.body;
+    const { userRole, id } = req.obj;
+
+    const productImages = [];
+    req.files.forEach((file) => {
+      productImages.push(file.originalname);
+    });
+
+    const [checkProduct] = await sequelize.query(
+      "select * from products where id = ?",
+      {
+        type: QueryTypes.SELECT,
+        replacements: [productId],
+      }
+    );
+
+    if (checkProduct == undefined) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+
+    const [categoryDetail] = await sequelize.query(
+      "select * from categories where id = ?",
+      {
+        type: QueryTypes.SELECT,
+        replacements: [categoryId],
+      }
+    );
+    if (categoryDetail == undefined) {
+      return res.status(404).json({ error: "No category found....!" });
+    }
+
+    if (userRole != 1) {
+      if (id != categoryDetail.createdBy) {
+        return res.status(400).json({
+          error: `Category does not belong's to you Mr.${firstname} you cannot update the product`,
+        });
+      }
+    }
+
+    const updateProduct = await sequelize.query(
+      `UPDATE "products" SET "name" = ?, "description" = ?, "categoryId" = ?, "price" = ?, "images" = ? WHERE "products"."id" = ?`,
+      {
+        type: QueryTypes.UPDATE,
+        replacements: [
+          categoryName,
+          description,
+          categoryId,
+          price,
+          JSON.stringify(productImages) || "Random",
+        ],
+      }
+    );
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
 module.exports = {
   listProducts,
   addProducts,
+  updateProducts,
 };
