@@ -17,6 +17,42 @@ const listProducts = async (req, res) => {
   }
 };
 
+const listProductByUser = async (req, res) => {
+  try {
+    const { id, firstname, gender, userRole } = req.obj;
+
+    const sql = `select products.id, name, description, categoryId, 
+    price, images from products LEFT JOIN categories on products.categoryId = categories.id
+     LEFT JOIN users on users.id = categories.createdBy WHERE users.id = 21;`;
+
+    const userProducts = await sequelize.query(
+      `select products.id, name, description, categoryId, 
+    price, images from products LEFT JOIN categories on products.categoryId = categories.id
+     LEFT JOIN users on users.id = categories.createdBy WHERE users.id = ?`,
+      {
+        type: QueryTypes.SELECT,
+        replacements: [id],
+      }
+    );
+
+    if (userProducts.length == 0) {
+      res.status(400).json({ error: "No products to show" });
+    }
+
+    const userCategories = await sequelize.query(
+      "select * from categories where createdBy = ?",
+      {
+        type: QueryTypes.SELECT,
+        replacements: [id],
+      }
+    );
+
+    res.status(200).json({ stauts: "success", userProducts, userCategories });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 const addProducts = async (req, res) => {
   const { categoryName, description, categoryId, price } = req.body;
   const { userRole, id } = req.obj;
@@ -131,6 +167,26 @@ const addProducts = async (req, res) => {
     return res
       .status(500)
       .json({ error: "Internal server error", msg: err.message });
+  }
+};
+
+const searchProducts = async (req, res) => {
+  const { searchStr } = req.body;
+  try {
+    const search = await sequelize.query(
+      `SELECT * from products where name like "%${searchStr}%"`,
+      {
+        type: QueryTypes.SELECT,
+      }
+    );
+
+    if (search.length == 0) {
+      return res.status(404).json({ error: "Item not found" });
+    }
+
+    res.status(200).json({ status: "success", result: search });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 };
 
@@ -266,7 +322,9 @@ const deleteProducts = async (req, res) => {
 
 module.exports = {
   listProducts,
+  listProductByUser,
   addProducts,
+  searchProducts,
   updateProducts,
   deleteProducts,
 };

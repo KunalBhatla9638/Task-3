@@ -22,7 +22,9 @@ const {
 //Products Controllers
 const {
   listProducts,
+  listProductByUser,
   addProducts,
+  searchProducts,
   updateProducts,
   deleteProducts,
 } = require("../controllers/ProductControllers");
@@ -43,6 +45,7 @@ router.post("/login", loginUser);
 
 //Category Route
 router.get("/list", verifyToken, listCategory);
+router.get("/listProductByUser", verifyToken, listProductByUser);
 router.post("/addCategory", verifyToken, addCategory);
 router.patch("/updateCategory/:id", verifyToken, updateCategory);
 router.delete("/deleteCategory/:id", verifyToken, deleteCategory);
@@ -55,6 +58,7 @@ router.post(
   verifyToken,
   addProducts
 );
+router.post("/searchProducts", verifyToken, searchProducts);
 router.patch(
   "/updateProduct/:id",
   uploadPhoto.array("productImages", 12),

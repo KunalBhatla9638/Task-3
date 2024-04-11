@@ -3,6 +3,7 @@ import "./HomePage.css";
 import axios from "axios";
 import BASEURL from "../../axios";
 import { toast } from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 const HomePage = () => {
   const [formData, setFormData] = useState({
@@ -43,6 +44,7 @@ const HomePage = () => {
     setFormData({ ...formData, hobbies: updateHobbies });
   };
 
+  const navigate = useNavigate();
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
@@ -65,6 +67,7 @@ const HomePage = () => {
       if (code == 201) {
         console.log(successMsg);
         toast.success(successMsg);
+        navigate("/login");
       }
     } catch (err) {
       //   const code = err.response.status;
@@ -244,12 +247,12 @@ const HomePage = () => {
             </div>
           </div>
         </form>
-        <div class="container mt-5">
-          <div class="row justify-content-center">
-            <div class="col-md-6">
-              <p class="text-center">
+        <div className="container mt-5">
+          <div className="row justify-content-center">
+            <div className="col-md-6">
+              <p className="text-center">
                 Already have an account?{" "}
-                <a href="/login" class="btn btn-primary">
+                <a href="/login" className="btn btn-primary">
                   Login
                 </a>
               </p>

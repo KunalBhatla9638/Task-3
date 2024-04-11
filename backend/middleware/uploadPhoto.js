@@ -12,8 +12,8 @@ const storage = multer.diskStorage({
     cb(null, dir);
   },
   filename: (req, file, cb) => {
-    const renamed = Date.now() + "-" + file.originalname;
-    cb(null, renamed);
+    // const renamed = Date.now() + "-" + file.originalname;
+    cb(null, file.originalname);
   },
 });
 

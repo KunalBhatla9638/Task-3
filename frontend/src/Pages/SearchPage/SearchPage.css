@@ -1,0 +1,29 @@
+.product-wrapper {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px 10px;
+  flex-wrap: wrap;
+}
+.card {
+  /* max-width: 18rem; */
+  transition: transform 0.3s;
+  border: 1px solid black;
+  cursor: pointer;
+  padding: 10px;
+}
+
+.last {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+img {
+  height: 320px;
+  object-fit: cover;
+  object-position: center;
+}
+
+.card:hover {
+  transform: scale(1.01);
+}
