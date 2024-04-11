@@ -125,6 +125,10 @@ const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
 
+    if (!email && !password) {
+      return res.status(400).json({ error: "Both fields are empty" });
+    }
+
     if (!email) {
       return res.status(400).json({ error: "Email cannot be empty" });
     }
@@ -164,9 +168,12 @@ const loginUser = async (req, res) => {
           return res.status(404).json({ error: "Token error" });
         }
 
-        res
-          .status(200)
-          .json({ status: "success", id: checkUser.id, authToken });
+        res.status(200).json({
+          status: "success",
+          message: "Successfully login",
+          id: checkUser.id,
+          authToken,
+        });
       }
     );
   } catch (err) {

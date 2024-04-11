@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import "./HomePage.css";
 import axios from "axios";
 import BASEURL from "../../axios";
@@ -244,6 +244,18 @@ const HomePage = () => {
             </div>
           </div>
         </form>
+        <div class="container mt-5">
+          <div class="row justify-content-center">
+            <div class="col-md-6">
+              <p class="text-center">
+                Already have an account?{" "}
+                <a href="/login" class="btn btn-primary">
+                  Login
+                </a>
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     </>
   );
