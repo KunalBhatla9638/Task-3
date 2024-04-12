@@ -30,7 +30,9 @@ const CategoryPage = () => {
 
       if (response.status == 200) {
         console.log(response);
-        setCategory(response.data.showCategoryByUser);
+        setCategory(
+          response.data.showCategoryByUser || response.data.showCategoryByAdmin
+        );
       }
     } catch (error) {
       const errorCode = error.response.status;

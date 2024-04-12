@@ -25,18 +25,25 @@ const listProductByUser = async (req, res) => {
     price, images from products LEFT JOIN categories on products.categoryId = categories.id
      LEFT JOIN users on users.id = categories.createdBy WHERE users.id = 21;`;
 
-    const userProducts = await sequelize.query(
-      `select products.id, name, description, categoryId, 
+    let userProducts;
+    if (userRole != 2) {
+      userProducts = await sequelize.query("Select * from products", {
+        type: QueryTypes.SELECT,
+      });
+    } else {
+      userProducts = await sequelize.query(
+        `select products.id, name, description, categoryId, 
     price, images from products LEFT JOIN categories on products.categoryId = categories.id
      LEFT JOIN users on users.id = categories.createdBy WHERE users.id = ?`,
-      {
-        type: QueryTypes.SELECT,
-        replacements: [id],
-      }
-    );
+        {
+          type: QueryTypes.SELECT,
+          replacements: [id],
+        }
+      );
+    }
 
     if (userProducts.length == 0) {
-      res.status(400).json({ error: "No products to show" });
+      return res.status(400).json({ error: "No products to show" });
     }
 
     const userCategories = await sequelize.query(
@@ -49,7 +56,7 @@ const listProductByUser = async (req, res) => {
 
     res.status(200).json({ stauts: "success", userProducts, userCategories });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 };
 

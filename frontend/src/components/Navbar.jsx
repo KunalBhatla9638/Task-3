@@ -1,10 +1,11 @@
 import { useContext, useState } from "react";
 import "./Navbar.css";
 import { UserContext } from "../../context/UserContext";
+import { useNavigate } from "react-router-dom";
 
 const Navbar = () => {
   const { setStr } = useContext(UserContext);
-
+  const navigate = useNavigate();
   return (
     <nav
       className="navbar navbar-light bg-light sticky-top"
@@ -40,6 +41,16 @@ const Navbar = () => {
             Search
           </button>
         </form>
+        <button
+          className="btn btn-outline-danger"
+          type="button"
+          onClick={() => {
+            localStorage.removeItem("auth");
+            navigate("/login");
+          }}
+        >
+          Logout
+        </button>
       </div>
     </nav>
   );
