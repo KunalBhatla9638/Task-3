@@ -150,8 +150,8 @@ const sendMail = async () => {
   let mailDetails = {
     from: process.env.SMTP_MAIL,
     to: "kunallaptop72@gmail.com",
-    subject: "Testing mail",
-    text: `You got ${count} time this email`,
+    subject: "Email from cron",
+    text: `You got ${count[0].countemail} time this email`,
   };
 
   mailTransporter.sendMail(mailDetails, async function (err, data) {
