@@ -9,6 +9,7 @@ import CategoryPage from "./Pages/CategoryPage/CategoryPage";
 import Navbar from "./components/Navbar";
 import { UserContextProvider } from "../context/UserContext";
 import ProductPage from "./Pages/ProductPage/ProductPage";
+import SupportPage from "./Pages/SupportPage/SupportPage";
 
 function App() {
   return (
@@ -41,6 +42,15 @@ function App() {
               element={
                 <>
                   <Navbar /> <ProductPage />
+                </>
+              }
+            />
+
+            <Route
+              path="/support"
+              element={
+                <>
+                  <Navbar /> <SupportPage />
                 </>
               }
             />

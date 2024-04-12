@@ -26,6 +26,11 @@ const Navbar = () => {
               Products
             </a>
           </div>
+          <div className="col">
+            <a className="nav-link" href="/support">
+              Support
+            </a>
+          </div>
         </div>
         <form className="d-flex">
           <input

@@ -65,7 +65,7 @@ const addProducts = async (req, res) => {
   const { userRole, id } = req.obj;
   const productImages = [];
 
-  req.files?.forEach((file) => {
+  req.files.forEach((file) => {
     productImages.push(file.originalname);
   });
 
@@ -93,15 +93,15 @@ const addProducts = async (req, res) => {
     });
   }
 
-  if (
-    !productImages ||
-    !Array.isArray(productImages) ||
-    productImages.length == 0
-  ) {
-    return res.status(400).json({
-      error: "At least one image is required",
-    });
-  }
+  // if (
+  //   !productImages ||
+  //   !Array.isArray(productImages) ||
+  //   productImages.length == 0
+  // ) {
+  //   return res.status(400).json({
+  //     error: "At least one image is required",
+  //   });
+  // }
 
   try {
     const nameExist = await sequelize.query(

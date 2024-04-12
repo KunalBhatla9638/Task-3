@@ -26,10 +26,12 @@ const ProductPage = () => {
 
   const handleFileChange = (e) => {
     const images = e.target.files;
-    console.log(images);
+    const imgs = [];
     for (let data of images) {
-      console.log(data);
+      imgs.push(data);
     }
+    console.log(imgs);
+    setProductData({ ...productData, productImages: images });
   };
 
   const handleChanges = (e) => {
@@ -159,6 +161,7 @@ const ProductPage = () => {
       const errorCode = error.response.status;
       if (errorCode == 400 || 404 || 500) {
         console.log(form);
+        console.log(productData);
         toast.error(error.response.data.error);
       }
     }

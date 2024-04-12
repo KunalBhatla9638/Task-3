@@ -1,8 +1,12 @@
 const express = require("express");
+
 const router = express();
 
 //Role controller
 const { AddRole } = require("../controllers/AddingRole");
+
+//Email Controller
+const { emailHandler } = require("../controllers/EmailController");
 
 //User Controllers
 const {
@@ -33,6 +37,8 @@ const {
 const uploadPhoto = require("../middleware/uploadPhoto");
 // authentication --Middleware
 const { verifyToken } = require("../middleware/authentication");
+
+require("../controllers/CronController");
 
 //Welcome Route
 router.get("/", welcome);
@@ -66,5 +72,22 @@ router.patch(
   updateProducts
 );
 router.delete("/deleteProduct/:id", verifyToken, deleteProducts);
+
+//Email Handler
+router.post(
+  "/sendEmail",
+  uploadPhoto.single("uploadedFile"),
+  verifyToken,
+  emailHandler
+);
+
+// (async () => {
+//   try {
+//     await cronMail();
+//     console.log("Started");
+//   } catch (error) {
+//     console.error("Error starting cron job:", error.message);
+//   }
+// })();
 
 module.exports = router;
