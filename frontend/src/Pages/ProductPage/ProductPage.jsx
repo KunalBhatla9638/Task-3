@@ -20,21 +20,23 @@ const ProductPage = () => {
     description: "",
     categoryId: "",
     price: "",
-    images: "",
+    productImages: null,
   });
+  const [catId, setcatId] = useState(-1);
 
-  //   const handleChanges = (e) => {
-  //     const { value, name } = e.target;
-  //     setProductData((prevData) => ({
-  //       ...prevData,
-  //       [name]: value,
-  //     }));
-  //   };
+  const handleFileChange = (e) => {
+    const images = e.target.files;
+    console.log(images);
+    for (let data of images) {
+      console.log(data);
+    }
+  };
 
   const handleChanges = (e) => {
     const { value, name } = e.target;
-    setProductData((prevData) => ({
-      ...prevData,
+    console.log(value, name);
+    setProductData((prev) => ({
+      ...prev,
       [name]: value,
     }));
   };
@@ -77,15 +79,6 @@ const ProductPage = () => {
     const productCurrentCategory = userCategory.find(
       (item) => item.id == userProducts[idx].categoryId
     );
-
-    // setProductData((prevData) => ({
-    //   ...prevData,
-    //   name: userProducts[idx].name,
-    //   description: userProducts[idx].description,
-    //   categoryId: userProducts[idx].categoryId,
-    //   price: userProducts[idx].price,
-    //   images: userProducts[idx].images,
-    // }));
     setProductData({
       name: userProducts[idx].name,
       description: userProducts[idx].description,
@@ -97,43 +90,78 @@ const ProductPage = () => {
   };
 
   const handleCategoryChange = (selectedCategory) => {
+    setcatId(selectedCategory);
     setProductData({ ...productData, categoryId: selectedCategory });
+    console.log(productData.categoryId);
   };
 
   const onClickUpdateProduct = async (e) => {
+    const form = new FormData();
     try {
       e.preventDefault();
-      // console.log(productData);
-      const response = await axios.patch(
-        API + `/updateProduct/${id}`,
-        productData,
-        {
-          headers: {
-            authorization: `svs ${token}`,
-          },
-        }
-      );
+      form.append("categoryName", productData.name);
+      form.append("description", productData.description);
+      form.append("categoryId", productData.categoryId);
+      form.append("price", productData.price);
+      form.append("images", productData.images);
+
+      console.log(productData.images);
+
+      const response = await axios.patch(API + `/updateProduct/${id}`, form, {
+        headers: {
+          authorization: `svs ${token}`,
+        },
+      });
       if (response.status == 200) {
         setUpdateProductCard(false);
         fetchProducts();
         console.log(response);
-        toast.success(response.data.msg);
+        toast.success(response.data.status);
       }
     } catch (error) {
       const errorCode = error.response.status;
       if (errorCode == 400 || 404 || 500) {
+        console.log(form);
         toast.error(error.response.data.error);
       }
     }
   };
 
-  const onClickAddProduct = () => {
+  const onClickAddProduct = async () => {
     setAddProductCard(true);
   };
 
-  const AddProduct = (e) => {
+  const AddProduct = async (e) => {
     e.preventDefault();
-    console.log(productData);
+    const form = new FormData();
+    try {
+      e.preventDefault();
+      form.append("categoryName", productData.name);
+      form.append("description", productData.description);
+      form.append("categoryId", productData.categoryId);
+      form.append("price", productData.price);
+      form.append("productImages", productData.productImages);
+
+      console.log(productData.images);
+
+      const response = await axios.post(API + `/addProducts`, form, {
+        headers: {
+          authorization: `svs ${token}`,
+        },
+      });
+      if (response.status == 200) {
+        setAddProductCard(false);
+        fetchProducts();
+        console.log(response);
+        toast.success(response.data.status);
+      }
+    } catch (error) {
+      const errorCode = error.response.status;
+      if (errorCode == 400 || 404 || 500) {
+        console.log(form);
+        toast.error(error.response.data.error);
+      }
+    }
   };
 
   const deleteProduct = async (id) => {
@@ -163,7 +191,7 @@ const ProductPage = () => {
         <div className="card">
           <div className="card-body">
             <h4 className="card-title">Update Product</h4>
-            <form encType="multipart/form-data" onSubmit={onClickUpdateProduct}>
+            <form onSubmit={onClickUpdateProduct} encType="multipart/form-data">
               <div className="mb-3">
                 {/* Name */}
                 <label htmlFor="nameInput" className="form-label">
@@ -172,7 +200,7 @@ const ProductPage = () => {
                 <input
                   type="text"
                   className="form-control"
-                  name="nameInput"
+                  name="name"
                   placeholder="Enter Name"
                   value={productData.name}
                   onChange={handleChanges}
@@ -186,7 +214,7 @@ const ProductPage = () => {
                 <input
                   type="text"
                   className="form-control"
-                  name="descriptionInput"
+                  name="description"
                   placeholder="Enter Description"
                   value={productData.description}
                   onChange={handleChanges}
@@ -199,7 +227,7 @@ const ProductPage = () => {
                 </label>
                 <select
                   className="form-select"
-                  name="categoryIdInput"
+                  name="categoryId"
                   value={productData.categoryId}
                   onChange={(e) => handleCategoryChange(e.target.value)}
                 >
@@ -220,7 +248,7 @@ const ProductPage = () => {
                 <input
                   type="number"
                   className="form-control"
-                  name="priceInput"
+                  name="price"
                   placeholder="Enter Price"
                   value={productData.price}
                   onChange={handleChanges}
@@ -235,6 +263,7 @@ const ProductPage = () => {
                   type="file"
                   className="form-control"
                   name="productImages"
+                  onClick={handleFileChange}
                   multiple
                 />
               </div>
@@ -246,6 +275,13 @@ const ProductPage = () => {
                 className="btn btn-danger"
                 onClick={() => {
                   setUpdateProductCard(false);
+                  setProductData({
+                    name: "",
+                    description: "",
+                    categoryId: "",
+                    price: "",
+                    productImages: null,
+                  });
                 }}
               >
                 Close
@@ -268,7 +304,7 @@ const ProductPage = () => {
                 <input
                   type="text"
                   className="form-control"
-                  name="nameInput"
+                  name="name"
                   placeholder="Enter Name"
                   value={productData.name}
                   onChange={handleChanges}
@@ -282,7 +318,7 @@ const ProductPage = () => {
                 <input
                   type="text"
                   className="form-control"
-                  name="descriptionInput"
+                  name="description"
                   placeholder="Enter Description"
                   value={productData.description}
                   onChange={handleChanges}
@@ -295,7 +331,7 @@ const ProductPage = () => {
                 </label>
                 <select
                   className="form-select"
-                  name="categoryIdInput"
+                  name="categoryId"
                   value={productData.categoryId}
                   onChange={(e) => handleCategoryChange(e.target.value)}
                 >
@@ -316,7 +352,7 @@ const ProductPage = () => {
                 <input
                   type="number"
                   className="form-control"
-                  name="priceInput"
+                  name="price"
                   placeholder="Enter Price"
                   value={productData.price}
                   onChange={handleChanges}
@@ -331,6 +367,7 @@ const ProductPage = () => {
                   type="file"
                   className="form-control"
                   name="productImages"
+                  onChange={handleFileChange}
                   multiple
                 />
               </div>
@@ -341,7 +378,7 @@ const ProductPage = () => {
                 type="button"
                 className="btn btn-danger"
                 onClick={() => {
-                  setUpdateProductCard(false);
+                  setAddProductCard(false);
                 }}
               >
                 Close

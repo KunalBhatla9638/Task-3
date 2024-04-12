@@ -63,44 +63,43 @@ const listProductByUser = async (req, res) => {
 const addProducts = async (req, res) => {
   const { categoryName, description, categoryId, price } = req.body;
   const { userRole, id } = req.obj;
-
   const productImages = [];
 
-  req.files.forEach((file) => {
+  req.files?.forEach((file) => {
     productImages.push(file.originalname);
   });
 
   if (!categoryName) {
     return res.status(400).json({
-      message: "Name is required",
+      error: "Name is required",
     });
   }
 
   if (!description || description.trim() === "") {
     return res.status(400).json({
-      message: "Description is required",
+      error: "Description is required",
     });
   }
 
-  if (!categoryId || categoryId.trim() === "") {
+  if (!categoryId) {
     return res.status(400).json({
-      message: "Category ID is required",
+      error: "Category ID is required",
     });
   }
 
   if (!price || isNaN(price) || price <= 0) {
     return res.status(400).json({
-      message: "Price must be a positive number",
+      error: "Price must be a positive number",
     });
   }
 
   if (
     !productImages ||
     !Array.isArray(productImages) ||
-    productImages.length === 0
+    productImages.length == 0
   ) {
     return res.status(400).json({
-      message: "At least one image is required",
+      error: "At least one image is required",
     });
   }
 
