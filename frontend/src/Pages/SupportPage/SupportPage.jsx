@@ -34,7 +34,6 @@ const SupportPage = () => {
       ...emailData,
       uploadedFile: e.target.files[0],
     });
-    console.log(e.target.files[0]);
   };
   const onClickSubmit = async (e) => {
     try {

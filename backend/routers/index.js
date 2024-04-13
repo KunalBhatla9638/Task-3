@@ -38,7 +38,7 @@ const uploadPhoto = require("../middleware/uploadPhoto");
 // authentication --Middleware
 const { verifyToken } = require("../middleware/authentication");
 
-require("../controllers/CronController");
+// require("../controllers/CronController");
 
 //Welcome Route
 router.get("/", welcome);

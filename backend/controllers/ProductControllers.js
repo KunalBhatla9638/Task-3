@@ -64,7 +64,6 @@ const addProducts = async (req, res) => {
   const { categoryName, description, categoryId, price } = req.body;
   const { userRole, id } = req.obj;
   const productImages = [];
-
   req.files.forEach((file) => {
     productImages.push(file.originalname);
   });
@@ -165,6 +164,8 @@ const addProducts = async (req, res) => {
         replacements: [insertProduct[0], JSON.stringify(productImages)],
       }
     );
+
+    console.log(productImages);
 
     res.status(200).json({ status: "success" });
 

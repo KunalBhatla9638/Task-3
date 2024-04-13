@@ -22,16 +22,15 @@ const ProductPage = () => {
     price: "",
     productImages: null,
   });
-  const [catId, setcatId] = useState(-1);
 
   const handleFileChange = (e) => {
-    const images = e.target.files;
-    const imgs = [];
-    for (let data of images) {
-      imgs.push(data);
-    }
-    console.log(imgs);
-    setProductData({ ...productData, productImages: images });
+    // const images = e.target.files;
+    // const imgs = [];
+    // for (let data of images) {
+    //   imgs.push(data);
+    // }
+    // console.log(images);
+    setProductData({ ...productData, productImages: e.target.files });
   };
 
   const handleChanges = (e) => {
@@ -92,7 +91,6 @@ const ProductPage = () => {
   };
 
   const handleCategoryChange = (selectedCategory) => {
-    setcatId(selectedCategory);
     setProductData({ ...productData, categoryId: selectedCategory });
     console.log(productData.categoryId);
   };
@@ -137,14 +135,11 @@ const ProductPage = () => {
     e.preventDefault();
     const form = new FormData();
     try {
-      e.preventDefault();
       form.append("categoryName", productData.name);
       form.append("description", productData.description);
       form.append("categoryId", productData.categoryId);
       form.append("price", productData.price);
       form.append("productImages", productData.productImages);
-
-      console.log(productData.images);
 
       const response = await axios.post(API + `/addProducts`, form, {
         headers: {
@@ -158,8 +153,9 @@ const ProductPage = () => {
         toast.success(response.data.status);
       }
     } catch (error) {
+      console.log(response);
       const errorCode = error.response.status;
-      if (errorCode == 400 || 404 || 500) {
+      if (errorCode === 400 || errorCode === 404 || errorCode === 500) {
         console.log(form);
         console.log(productData);
         toast.error(error.response.data.error);
@@ -234,13 +230,11 @@ const ProductPage = () => {
                   value={productData.categoryId}
                   onChange={(e) => handleCategoryChange(e.target.value)}
                 >
-                  {userCategory.map((item) => {
-                    return (
-                      <option key={item.categoryname} value={item.id}>
-                        {item.categoryname}
-                      </option>
-                    );
-                  })}
+                  {userCategory.map((item) => (
+                    <option key={item.categoryname} value={item.id}>
+                      {item.categoryname}
+                    </option>
+                  ))}
                 </select>
               </div>
               <div className="mb-3">
@@ -298,7 +292,7 @@ const ProductPage = () => {
         <div className="card">
           <div className="card-body">
             <h4 className="card-title">Add Product</h4>
-            <form encType="multipart/form-data" onSubmit={AddProduct}>
+            <form onSubmit={AddProduct} encType="multipart/form-data">
               <div className="mb-3">
                 {/* Name */}
                 <label htmlFor="nameInput" className="form-label">
@@ -335,9 +329,11 @@ const ProductPage = () => {
                 <select
                   className="form-select"
                   name="categoryId"
-                  value={productData.categoryId}
                   onChange={(e) => handleCategoryChange(e.target.value)}
                 >
+                  <option value="" defaultChecked>
+                    --select--
+                  </option>
                   {userCategory.map((item) => {
                     return (
                       <option key={item.categoryname} value={item.id}>
