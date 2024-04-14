@@ -48,13 +48,21 @@ const listProductByUser = async (req, res) => {
     //     .json({ error: "No products to show", msg: "Just want to share" });
     // }
 
-    const userCategories = await sequelize.query(
-      "select * from categories where createdBy = ?",
-      {
+    let userCategories;
+    if (userRole != 1) {
+      userCategories = await sequelize.query(
+        "select * from categories where createdBy = ?",
+        {
+          type: QueryTypes.SELECT,
+          replacements: [id],
+        }
+      );
+    } else {
+      userCategories = await sequelize.query("select * from categories", {
         type: QueryTypes.SELECT,
         replacements: [id],
-      }
-    );
+      });
+    }
 
     res.status(200).json({ stauts: "success", userProducts, userCategories });
   } catch (error) {
@@ -166,9 +174,6 @@ const addProducts = async (req, res) => {
         replacements: [insertProduct[0], JSON.stringify(productImages)],
       }
     );
-
-    console.log(productImages);
-
     res.status(200).json({ status: "success" });
 
     //RETRIVE QUERY for particular -> select * from products LEFT JOIN categories on products.categoryId = categories.id LEFT JOIN users on categories.createdBy = users.id WHERE users.id = 3;
@@ -199,6 +204,7 @@ const searchProducts = async (req, res) => {
   }
 };
 
+//*image issue
 const updateProducts = async (req, res) => {
   try {
     const productId = req.params.id;
@@ -206,12 +212,14 @@ const updateProducts = async (req, res) => {
     const { userRole, id, firstname } = req.obj;
 
     const productImages = [];
+    let flag = false;
 
-    if (req.files && req.files.length > 0)
-      req.files?.forEach((file) => {
+    if (req.files && req.files.length > 0) {
+      flag = true;
+      req.files.forEach((file) => {
         productImages.push(file.originalname);
       });
-
+    }
     const [checkProduct] = await sequelize.query(
       "select * from products where id = ?",
       {
@@ -252,7 +260,7 @@ const updateProducts = async (req, res) => {
           description || checkProduct.description,
           categoryId || checkProduct.categoryId,
           price || checkProduct.price,
-          req.files ? JSON.stringify(productImages) : checkProduct.images,
+          flag ? JSON.stringify(productImages) : checkProduct.images,
           productId,
         ],
       }

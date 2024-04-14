@@ -1,14 +1,17 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import API from "../../axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import "./ProductPage.css";
+import { UserContext } from "../../../context/UserContext";
 
 const ProductPage = () => {
   const token = localStorage.getItem("auth");
   const navigate = useNavigate();
   const [id, setId] = useState(-1);
+  const { str } = useContext(UserContext);
+  console.log(str);
 
   const [loader, setLoader] = useState(false);
   const [updateProductCard, setUpdateProductCard] = useState(false);
@@ -24,11 +27,12 @@ const ProductPage = () => {
   });
 
   const [pimg, setPimg] = useState("");
-  const [prevImagees, setPrevImages] = useState("");
+  // const [prevImagees, setPrevImages] = useState("");
 
   const handleFileChange = (e) => {
     setPimg(e.target.files);
-    setProductData({ ...productData, productImages: e.target.files });
+    console.log(e.target.files);
+    // setProductData({ ...productData, productImages: e.target.files });
   };
 
   const handleChanges = (e) => {
@@ -84,12 +88,13 @@ const ProductPage = () => {
     const productCurrentCategory = userCategory.find(
       (item) => item.id == userProducts[idx].categoryId
     );
-    setPrevImages(userProducts[idx].images);
+    // setPrevImages(userProducts[idx].images);
     setProductData({
       name: userProducts[idx].name,
       description: userProducts[idx].description,
       categoryId: userProducts[idx].categoryId,
       price: userProducts[idx].price,
+      productImages: null,
     });
     setUpdateProductCard(true);
   };
@@ -103,14 +108,16 @@ const ProductPage = () => {
       form.append("categoryId", productData.categoryId);
       form.append("price", productData.price);
 
-      if (pimg.length !== 0) {
+      console.log(pimg);
+      if (pimg.length != 0) {
         for (let i = 0; i < pimg.length; i++) {
           console.log(pimg[i]);
           form.append(`productImages`, pimg[i]);
         }
-      } else {
-        form.append("images", JSON.stringify(prevImagees));
       }
+      // else {
+      //   form.append("images", JSON.stringify(prevImagees));
+      // }
 
       const response = await axios.patch(API + `/updateProduct/${id}`, form, {
         headers: {
@@ -199,15 +206,12 @@ const ProductPage = () => {
     }
   };
 
+  const scrollToTop = () => window.scrollTo(0, 0);
+
   const imageBaseurl = "http://localhost:4000/api/public/";
 
   const handleCancel = async (imageToDelete, id) => {
     console.log(id, imageToDelete);
-    // console.log(userProducts);
-    // const idx = userProducts.findIndex((item) => item.id == id);
-    // const images = userProducts[idx].images;
-    // const result = JSON.parse(images).filter((item) => item != img);
-    // console.log(result);
     try {
       const response = await axios.patch(
         API + `/deleteImage/${id}`,
@@ -309,12 +313,12 @@ const ProductPage = () => {
                   type="file"
                   className="form-control"
                   name="productImages"
-                  onClick={handleFileChange}
+                  onChange={handleFileChange}
                   multiple
                 />
               </div>
-              <button type="submit" className="btn btn-success me-2">
-                Submit
+              <button type="submit" className="btn btn-primary me-2">
+                Update
               </button>
               <button
                 type="button"
@@ -419,8 +423,8 @@ const ProductPage = () => {
                   multiple
                 />
               </div>
-              <button type="submit" className="btn btn-success me-2">
-                Submit
+              <button type="submit" className="btn btn-primary me-2">
+                Add
               </button>
               <button
                 type="button"
@@ -476,6 +480,7 @@ const ProductPage = () => {
                   item;
 
                 const img = JSON.parse(images);
+                console.log(categoryId);
 
                 return (
                   <tr key={id}>
@@ -549,6 +554,13 @@ const ProductPage = () => {
           </table>
         </div>
       </div>
+      <button
+        type="button"
+        className="btn btn-dark top-arrow-button"
+        onClick={scrollToTop}
+      >
+        Go to top
+      </button>
     </>
   );
 };

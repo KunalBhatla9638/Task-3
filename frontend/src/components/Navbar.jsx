@@ -50,8 +50,11 @@ const Navbar = () => {
           className="btn btn-outline-danger"
           type="button"
           onClick={() => {
-            localStorage.removeItem("auth");
-            navigate("/login");
+            const result = confirm("Do you want to logout for sure..?");
+            if (result) {
+              localStorage.removeItem("auth");
+              navigate("/login");
+            }
           }}
         >
           Logout

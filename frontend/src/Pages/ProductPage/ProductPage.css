@@ -29,3 +29,11 @@
   background-color: rgba(255, 0, 0, 0.8);
   color: white;
 }
+
+.top-arrow-button {
+  position: fixed;
+  bottom: 20px; /* Adjust as needed */
+  right: 20px; /* Adjust as needed */
+  z-index: 1000; /* Ensure it appears above other content */
+  /* Add additional styles as needed for appearance */
+}
