@@ -23,13 +23,11 @@ const ProductPage = () => {
     productImages: null,
   });
 
+  const [pimg, setPimg] = useState("");
+  const [prevImagees, setPrevImages] = useState("");
+
   const handleFileChange = (e) => {
-    // const images = e.target.files;
-    // const imgs = [];
-    // for (let data of images) {
-    //   imgs.push(data);
-    // }
-    // console.log(images);
+    setPimg(e.target.files);
     setProductData({ ...productData, productImages: e.target.files });
   };
 
@@ -64,7 +62,7 @@ const ProductPage = () => {
       }
     } catch (error) {
       const errorCode = error.response.status;
-      if (errorCode == 204 || 200 || 500) {
+      if (errorCode == 204 || 400 || 200 || 500) {
         toast.error(error.response.data.error);
       }
     }
@@ -74,25 +72,26 @@ const ProductPage = () => {
     fetchProducts();
   }, []);
 
+  const handleCategoryChange = (selectedCategory) => {
+    setProductData({ ...productData, categoryId: selectedCategory });
+    console.log(productData.categoryId);
+  };
+
   const updateProduct = (id) => {
+    window.scrollTo(0, 0);
     setId(id);
     const idx = userProducts.findIndex((item) => item.id == id);
     const productCurrentCategory = userCategory.find(
       (item) => item.id == userProducts[idx].categoryId
     );
+    setPrevImages(userProducts[idx].images);
     setProductData({
       name: userProducts[idx].name,
       description: userProducts[idx].description,
       categoryId: userProducts[idx].categoryId,
       price: userProducts[idx].price,
-      images: userProducts[idx].images,
     });
     setUpdateProductCard(true);
-  };
-
-  const handleCategoryChange = (selectedCategory) => {
-    setProductData({ ...productData, categoryId: selectedCategory });
-    console.log(productData.categoryId);
   };
 
   const onClickUpdateProduct = async (e) => {
@@ -103,9 +102,15 @@ const ProductPage = () => {
       form.append("description", productData.description);
       form.append("categoryId", productData.categoryId);
       form.append("price", productData.price);
-      form.append("images", productData.images);
 
-      console.log(productData.images);
+      if (pimg.length !== 0) {
+        for (let i = 0; i < pimg.length; i++) {
+          console.log(pimg[i]);
+          form.append(`productImages`, pimg[i]);
+        }
+      } else {
+        form.append("images", JSON.stringify(prevImagees));
+      }
 
       const response = await axios.patch(API + `/updateProduct/${id}`, form, {
         headers: {
@@ -128,6 +133,7 @@ const ProductPage = () => {
   };
 
   const onClickAddProduct = async () => {
+    window.scrollTo(0, 0);
     setAddProductCard(true);
   };
 
@@ -139,7 +145,10 @@ const ProductPage = () => {
       form.append("description", productData.description);
       form.append("categoryId", productData.categoryId);
       form.append("price", productData.price);
-      form.append("productImages", productData.productImages);
+      //* When you are dealing with the mulitiple images it will give you the filelist object that can not be send through formdata so you need to iterate it one by one like below.
+      for (let i = 0; i < pimg.length; i++) {
+        form.append(`productImages`, pimg[i]);
+      }
 
       const response = await axios.post(API + `/addProducts`, form, {
         headers: {
@@ -151,6 +160,13 @@ const ProductPage = () => {
         fetchProducts();
         console.log(response);
         toast.success(response.data.status);
+        setProductData({
+          name: "",
+          description: "",
+          categoryId: "",
+          price: "",
+          productImages: null,
+        });
       }
     } catch (error) {
       console.log(response);
@@ -180,6 +196,39 @@ const ProductPage = () => {
       if (errorCode == 400 || 404 || 500 || 409) {
         toast.error(error.response.data.error);
       }
+    }
+  };
+
+  const imageBaseurl = "http://localhost:4000/api/public/";
+
+  const handleCancel = async (imageToDelete, id) => {
+    console.log(id, imageToDelete);
+    // console.log(userProducts);
+    // const idx = userProducts.findIndex((item) => item.id == id);
+    // const images = userProducts[idx].images;
+    // const result = JSON.parse(images).filter((item) => item != img);
+    // console.log(result);
+    try {
+      const response = await axios.patch(
+        API + `/deleteImage/${id}`,
+        {
+          imageToDelete,
+        },
+        {
+          headers: {
+            authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.status == 200) {
+        console.log(response);
+        fetchProducts();
+        toast.success(response.data.msg);
+      }
+    } catch (error) {
+      toast.error(error.response.data.error);
+      console.log("Error");
     }
   };
 
@@ -398,12 +447,12 @@ const ProductPage = () => {
                   Your Category
                 </th> */}
                 <th scope="col">Name</th>
-                <th scope="col" style={{ width: "100%" }}>
-                  Description
-                </th>
+                <th scope="col">Description</th>
                 <th scope="col">CategoryId</th>
                 <th scope="col">Price</th>
-                <th scope="col">Images</th>
+                <th scope="col" style={{ width: "100%" }}>
+                  Images
+                </th>
                 <th scope="col">Update</th>
                 <th scope="col">Delete</th>
               </tr>
@@ -425,14 +474,56 @@ const ProductPage = () => {
               {userProducts.map((item) => {
                 const { id, name, description, categoryId, price, images } =
                   item;
+
+                const img = JSON.parse(images);
+
                 return (
                   <tr key={id}>
                     <th scope="row">{id}</th>
-                    <td>{name}</td>
-                    <td>{description}</td>
+                    <td style={{ fontSize: "12px" }}>{name}</td>
+                    <td style={{ fontSize: "12px" }}>{description}</td>
                     <td>{categoryId}</td>
                     <td>{price}</td>
-                    <td>{images}</td>
+                    {/* <td>{images}</td> */}
+                    {/* <td>
+                      <div className="img-container">
+                        {img.map((item) => {
+                          return (
+                            <div className="custom-img" key={item}>
+                              <img
+                                src={imageBaseurl + item}
+                                className="card-img-top"
+                                alt="Product Image"
+                              />
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </td> */}
+                    <td>
+                      <div className="img-container">
+                        {img.map((item) => {
+                          return (
+                            <div className="custom-img-container" key={item}>
+                              <div className="custom-img">
+                                <button
+                                  className="cancel-button"
+                                  onClick={() => handleCancel(item, id)}
+                                >
+                                  &#x2716;{" "}
+                                  {/* Unicode character for 'multiplication x' symbol */}
+                                </button>
+                                <img
+                                  src={imageBaseurl + item}
+                                  className="card-img-top"
+                                  alt="Product Image"
+                                />
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </td>
                     <td>
                       <button
                         type="button"

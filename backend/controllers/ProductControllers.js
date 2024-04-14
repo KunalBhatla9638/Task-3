@@ -42,9 +42,11 @@ const listProductByUser = async (req, res) => {
       );
     }
 
-    if (userProducts.length == 0) {
-      return res.status(400).json({ error: "No products to show" });
-    }
+    // if (userProducts.length == 0) {
+    //   return res
+    //     .status(400)
+    //     .json({ error: "No products to show", msg: "Just want to share" });
+    // }
 
     const userCategories = await sequelize.query(
       "select * from categories where createdBy = ?",
@@ -197,7 +199,6 @@ const searchProducts = async (req, res) => {
   }
 };
 
-//Image issue it not remain same if you don't want to add the images
 const updateProducts = async (req, res) => {
   try {
     const productId = req.params.id;
@@ -205,9 +206,11 @@ const updateProducts = async (req, res) => {
     const { userRole, id, firstname } = req.obj;
 
     const productImages = [];
-    req.files.forEach((file) => {
-      productImages.push(file.originalname);
-    });
+
+    if (req.files && req.files.length > 0)
+      req.files?.forEach((file) => {
+        productImages.push(file.originalname);
+      });
 
     const [checkProduct] = await sequelize.query(
       "select * from products where id = ?",
@@ -249,7 +252,7 @@ const updateProducts = async (req, res) => {
           description || checkProduct.description,
           categoryId || checkProduct.categoryId,
           price || checkProduct.price,
-          JSON.stringify(productImages) || checkProduct.images,
+          req.files ? JSON.stringify(productImages) : checkProduct.images,
           productId,
         ],
       }
@@ -327,6 +330,56 @@ const deleteProducts = async (req, res) => {
   }
 };
 
+const deleteParticularImage = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const { imageToDelete } = req.body;
+
+    const [getProduct] = await sequelize.query(
+      "select * from products where id = ?",
+      {
+        type: QueryTypes.SELECT,
+        replacements: [id],
+      }
+    );
+
+    if (getProduct == undefined) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+
+    const results = JSON.parse(getProduct.images);
+
+    if (results.length <= 1) {
+      return res
+        .status(400)
+        .json({ error: "Atleast one image should be there" });
+    }
+
+    const result = results.filter((imgName) => imgName != imageToDelete);
+
+    const changeQuery = await sequelize.query(
+      "UPDATE `products` SET `images` = ? WHERE `products`.`id` = ?",
+      {
+        type: QueryTypes.UPDATE,
+        replacements: [JSON.stringify(result), id],
+      }
+    );
+
+    if (!changeQuery) {
+      return res
+        .status(400)
+        .json({ error: "Something went wrong while deleting the image" });
+    }
+
+    res.status(200).json({
+      status: "success",
+      msg: `${imageToDelete} deleted successfully`,
+    });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+};
+
 module.exports = {
   listProducts,
   listProductByUser,
@@ -334,4 +387,5 @@ module.exports = {
   searchProducts,
   updateProducts,
   deleteProducts,
+  deleteParticularImage,
 };

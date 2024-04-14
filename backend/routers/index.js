@@ -31,6 +31,7 @@ const {
   searchProducts,
   updateProducts,
   deleteProducts,
+  deleteParticularImage,
 } = require("../controllers/ProductControllers");
 
 // uploadPhoto --Middleware--
@@ -72,6 +73,7 @@ router.patch(
   updateProducts
 );
 router.delete("/deleteProduct/:id", verifyToken, deleteProducts);
+router.patch("/deleteImage/:id", verifyToken, deleteParticularImage);
 
 //Email Handler
 router.post(
