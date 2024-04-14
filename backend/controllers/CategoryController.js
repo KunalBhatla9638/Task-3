@@ -180,6 +180,24 @@ const deleteCategory = async (req, res) => {
       return res.status(404).json({ error: "No category found....!" });
     }
 
+    const checkProductWithThatCategoryExsits = await sequelize.query(
+      `
+        SELECT * from products
+    JOIN categories on categories.id = products.categoryId
+    WHERE products.categoryId = ?
+        `,
+      {
+        type: QueryTypes.SELECT,
+        replacements: [categoryId],
+      }
+    );
+
+    if (checkProductWithThatCategoryExsits.length != 0) {
+      return res
+        .status(400)
+        .json({ error: "Product with this category exist cannot delete this" });
+    }
+
     if (userRole != 1) {
       const holder = gender == "Male" ? "Mr." : "Miss.";
       if (id != categoryDetail.createdBy) {
@@ -208,9 +226,33 @@ const deleteCategory = async (req, res) => {
   }
 };
 
+//*Get all the category that are shown and used in the products
+const getCategory = async (req, res) => {
+  try {
+    const result = await sequelize.query(
+      `select DISTINCT categories.categoryname from categories 
+            RIGHT JOIN products on categories.id = products.categoryId`,
+      {
+        type: QueryTypes.SELECT,
+      }
+    );
+
+    if (!result) {
+      return res.status(400).json({
+        error: "Error while selecting the result according to the category",
+      });
+    }
+
+    res.status(200).json({ status: "success", result });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+};
+
 module.exports = {
   listCategory,
   addCategory,
   updateCategory,
   deleteCategory,
+  getCategory,
 };

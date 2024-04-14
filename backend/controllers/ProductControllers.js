@@ -204,7 +204,6 @@ const searchProducts = async (req, res) => {
   }
 };
 
-//*image issue
 const updateProducts = async (req, res) => {
   try {
     const productId = req.params.id;
@@ -251,6 +250,9 @@ const updateProducts = async (req, res) => {
       }
     }
 
+    const currentImage = JSON.parse(checkProduct.images);
+    const allImage = [...currentImage, ...productImages];
+
     const updateProduct = await sequelize.query(
       `UPDATE products SET name = ?, description = ?, categoryId = ?, price = ?, images = ? WHERE products.id = ?`,
       {
@@ -260,7 +262,8 @@ const updateProducts = async (req, res) => {
           description || checkProduct.description,
           categoryId || checkProduct.categoryId,
           price || checkProduct.price,
-          flag ? JSON.stringify(productImages) : checkProduct.images,
+          //flag ? JSON.stringify(productImages) : checkProduct.images,
+          JSON.stringify(allImage),
           productId,
         ],
       }
@@ -388,6 +391,32 @@ const deleteParticularImage = async (req, res) => {
   }
 };
 
+const fetchSearchAccordingFilter = async (req, res) => {
+  try {
+    const filter = req.params.filter;
+    const result = await sequelize.query(
+      `
+    select DISTINCT * from categories 
+    RIGHT JOIN products 
+    on categories.id = products.categoryId 
+    WHERE categories.categoryname = ?;
+    `,
+      {
+        type: QueryTypes.SELECT,
+        replacements: [filter],
+      }
+    );
+
+    if (!result) {
+      res.status(400).json({ error: "Something went wrong while selecting" });
+    }
+
+    res.status(200).json({ status: "success", result });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
 module.exports = {
   listProducts,
   listProductByUser,
@@ -396,4 +425,5 @@ module.exports = {
   updateProducts,
   deleteProducts,
   deleteParticularImage,
+  fetchSearchAccordingFilter,
 };

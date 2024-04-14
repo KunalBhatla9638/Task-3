@@ -21,6 +21,7 @@ const {
   addCategory,
   updateCategory,
   deleteCategory,
+  getCategory,
 } = require("../controllers/CategoryController");
 
 //Products Controllers
@@ -32,6 +33,7 @@ const {
   updateProducts,
   deleteProducts,
   deleteParticularImage,
+  fetchSearchAccordingFilter,
 } = require("../controllers/ProductControllers");
 
 // uploadPhoto --Middleware--
@@ -56,6 +58,7 @@ router.get("/listProductByUser", verifyToken, listProductByUser);
 router.post("/addCategory", verifyToken, addCategory);
 router.patch("/updateCategory/:id", verifyToken, updateCategory);
 router.delete("/deleteCategory/:id", verifyToken, deleteCategory);
+router.get("/getCategories", verifyToken, getCategory);
 
 // Products Route
 router.get("/products", verifyToken, listProducts);
@@ -74,6 +77,7 @@ router.patch(
 );
 router.delete("/deleteProduct/:id", verifyToken, deleteProducts);
 router.patch("/deleteImage/:id", verifyToken, deleteParticularImage);
+router.get("/filterProduct/:filter", verifyToken, fetchSearchAccordingFilter);
 
 //Email Handler
 router.post(

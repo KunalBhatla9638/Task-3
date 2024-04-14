@@ -11,7 +11,6 @@ const ProductPage = () => {
   const navigate = useNavigate();
   const [id, setId] = useState(-1);
   const { str } = useContext(UserContext);
-  console.log(str);
 
   const [loader, setLoader] = useState(false);
   const [updateProductCard, setUpdateProductCard] = useState(false);
@@ -25,6 +24,7 @@ const ProductPage = () => {
     price: "",
     productImages: null,
   });
+  const [notFound, setNotFound] = useState(false);
 
   const [pimg, setPimg] = useState("");
   // const [prevImagees, setPrevImages] = useState("");
@@ -72,9 +72,43 @@ const ProductPage = () => {
     }
   };
 
+  const fetchSearchProducts = async () => {
+    try {
+      const response = await axios.post(
+        `${API}/searchProducts`,
+        {
+          searchStr: str,
+        },
+        {
+          headers: {
+            authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.status == 200) {
+        setLoader(false);
+        setUserProducts(response.data.result);
+      }
+    } catch (error) {
+      const errorCode = error.response.status;
+      if (errorCode == 400 || 404 || 500) {
+        if (error.response.data.error == "Item not found") {
+          setNotFound(false);
+        }
+        toast.error(error.response.data.error);
+      }
+    }
+  };
+
+  console.log(str);
   useEffect(() => {
-    fetchProducts();
-  }, []);
+    if (str == "") {
+      fetchProducts();
+      setNotFound(true);
+    }
+    fetchSearchProducts();
+  }, [str]);
 
   const handleCategoryChange = (selectedCategory) => {
     setProductData({ ...productData, categoryId: selectedCategory });
@@ -237,331 +271,353 @@ const ProductPage = () => {
   };
 
   return (
-    <>
-      {/* <h1>Loading</h1> */}
-      {updateProductCard && (
-        <div className="card">
-          <div className="card-body">
-            <h4 className="card-title">Update Product</h4>
-            <form onSubmit={onClickUpdateProduct} encType="multipart/form-data">
-              <div className="mb-3">
-                {/* Name */}
-                <label htmlFor="nameInput" className="form-label">
-                  Name
-                </label>
-                <input
-                  type="text"
-                  className="form-control"
-                  name="name"
-                  placeholder="Enter Name"
-                  value={productData.name}
-                  onChange={handleChanges}
-                />
-              </div>
-              <div className="mb-3">
-                {/* Description */}
-                <label htmlFor="descriptionInput" className="form-label">
-                  Description
-                </label>
-                <input
-                  type="text"
-                  className="form-control"
-                  name="description"
-                  placeholder="Enter Description"
-                  value={productData.description}
-                  onChange={handleChanges}
-                />
-              </div>
-              <div className="mb-3">
-                {/* CategoryId */}
-                <label htmlFor="categoryIdInput" className="form-label">
-                  Category ID
-                </label>
-                <select
-                  className="form-select"
-                  name="categoryId"
-                  value={productData.categoryId}
-                  onChange={(e) => handleCategoryChange(e.target.value)}
+    <div>
+      {token ? (
+        <div>
+          {/* <h1>Loading</h1> */}
+          {updateProductCard && (
+            <div className="card">
+              <div className="card-body">
+                <h4 className="card-title">Update Product</h4>
+                <form
+                  onSubmit={onClickUpdateProduct}
+                  encType="multipart/form-data"
                 >
-                  {userCategory.map((item) => (
-                    <option key={item.categoryname} value={item.id}>
-                      {item.categoryname}
-                    </option>
-                  ))}
-                </select>
+                  <div className="mb-3">
+                    {/* Name */}
+                    <label htmlFor="nameInput" className="form-label">
+                      Name
+                    </label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      name="name"
+                      placeholder="Enter Name"
+                      value={productData.name}
+                      onChange={handleChanges}
+                    />
+                  </div>
+                  <div className="mb-3">
+                    {/* Description */}
+                    <label htmlFor="descriptionInput" className="form-label">
+                      Description
+                    </label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      name="description"
+                      placeholder="Enter Description"
+                      value={productData.description}
+                      onChange={handleChanges}
+                    />
+                  </div>
+                  <div className="mb-3">
+                    {/* CategoryId */}
+                    <label htmlFor="categoryIdInput" className="form-label">
+                      Category ID
+                    </label>
+                    <select
+                      className="form-select"
+                      name="categoryId"
+                      value={productData.categoryId}
+                      onChange={(e) => handleCategoryChange(e.target.value)}
+                    >
+                      {userCategory.map((item) => (
+                        <option key={item.categoryname} value={item.id}>
+                          {item.categoryname}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="mb-3">
+                    {/* Price */}
+                    <label htmlFor="priceInput" className="form-label">
+                      Price
+                    </label>
+                    <input
+                      type="number"
+                      className="form-control"
+                      name="price"
+                      placeholder="Enter Price"
+                      value={productData.price}
+                      onChange={handleChanges}
+                    />
+                  </div>
+                  <div className="mb-3">
+                    {/* Images */}
+                    <label htmlFor="imagesInput" className="form-label">
+                      Images
+                    </label>
+                    <input
+                      type="file"
+                      className="form-control"
+                      name="productImages"
+                      onChange={handleFileChange}
+                      multiple
+                    />
+                  </div>
+                  <button type="submit" className="btn btn-primary me-2">
+                    Update
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-danger"
+                    onClick={() => {
+                      setUpdateProductCard(false);
+                      setProductData({
+                        name: "",
+                        description: "",
+                        categoryId: "",
+                        price: "",
+                        productImages: null,
+                      });
+                    }}
+                  >
+                    Close
+                  </button>
+                </form>
               </div>
-              <div className="mb-3">
-                {/* Price */}
-                <label htmlFor="priceInput" className="form-label">
-                  Price
-                </label>
-                <input
-                  type="number"
-                  className="form-control"
-                  name="price"
-                  placeholder="Enter Price"
-                  value={productData.price}
-                  onChange={handleChanges}
-                />
-              </div>
-              <div className="mb-3">
-                {/* Images */}
-                <label htmlFor="imagesInput" className="form-label">
-                  Images
-                </label>
-                <input
-                  type="file"
-                  className="form-control"
-                  name="productImages"
-                  onChange={handleFileChange}
-                  multiple
-                />
-              </div>
-              <button type="submit" className="btn btn-primary me-2">
-                Update
-              </button>
-              <button
-                type="button"
-                className="btn btn-danger"
-                onClick={() => {
-                  setUpdateProductCard(false);
-                  setProductData({
-                    name: "",
-                    description: "",
-                    categoryId: "",
-                    price: "",
-                    productImages: null,
-                  });
-                }}
-              >
-                Close
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
+            </div>
+          )}
 
-      {addProductCard && (
-        <div className="card">
-          <div className="card-body">
-            <h4 className="card-title">Add Product</h4>
-            <form onSubmit={AddProduct} encType="multipart/form-data">
-              <div className="mb-3">
-                {/* Name */}
-                <label htmlFor="nameInput" className="form-label">
-                  Name
-                </label>
-                <input
-                  type="text"
-                  className="form-control"
-                  name="name"
-                  placeholder="Enter Name"
-                  value={productData.name}
-                  onChange={handleChanges}
-                />
-              </div>
-              <div className="mb-3">
-                {/* Description */}
-                <label htmlFor="descriptionInput" className="form-label">
-                  Description
-                </label>
-                <input
-                  type="text"
-                  className="form-control"
-                  name="description"
-                  placeholder="Enter Description"
-                  value={productData.description}
-                  onChange={handleChanges}
-                />
-              </div>
-              <div className="mb-3">
-                {/* CategoryId */}
-                <label htmlFor="categoryIdInput" className="form-label">
-                  Category ID
-                </label>
-                <select
-                  className="form-select"
-                  name="categoryId"
-                  onChange={(e) => handleCategoryChange(e.target.value)}
-                >
-                  <option value="" defaultChecked>
-                    --select--
-                  </option>
-                  {userCategory.map((item) => {
-                    return (
-                      <option key={item.categoryname} value={item.id}>
-                        {item.categoryname}
+          {addProductCard && (
+            <div className="card">
+              <div className="card-body">
+                <h4 className="card-title">Add Product</h4>
+                <form onSubmit={AddProduct} encType="multipart/form-data">
+                  <div className="mb-3">
+                    {/* Name */}
+                    <label htmlFor="nameInput" className="form-label">
+                      Name
+                    </label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      name="name"
+                      placeholder="Enter Name"
+                      value={productData.name}
+                      onChange={handleChanges}
+                    />
+                  </div>
+                  <div className="mb-3">
+                    {/* Description */}
+                    <label htmlFor="descriptionInput" className="form-label">
+                      Description
+                    </label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      name="description"
+                      placeholder="Enter Description"
+                      value={productData.description}
+                      onChange={handleChanges}
+                    />
+                  </div>
+                  <div className="mb-3">
+                    {/* CategoryId */}
+                    <label htmlFor="categoryIdInput" className="form-label">
+                      Category ID
+                    </label>
+                    <select
+                      className="form-select"
+                      name="categoryId"
+                      onChange={(e) => handleCategoryChange(e.target.value)}
+                    >
+                      <option value="" defaultChecked>
+                        --select--
                       </option>
-                    );
-                  })}
-                </select>
+                      {userCategory.map((item) => {
+                        return (
+                          <option key={item.categoryname} value={item.id}>
+                            {item.categoryname}
+                          </option>
+                        );
+                      })}
+                    </select>
+                  </div>
+                  <div className="mb-3">
+                    {/* Price */}
+                    <label htmlFor="priceInput" className="form-label">
+                      Price
+                    </label>
+                    <input
+                      type="number"
+                      className="form-control"
+                      name="price"
+                      placeholder="Enter Price"
+                      value={productData.price}
+                      onChange={handleChanges}
+                    />
+                  </div>
+                  <div className="mb-3">
+                    {/* Images */}
+                    <label htmlFor="imagesInput" className="form-label">
+                      Images
+                    </label>
+                    <input
+                      type="file"
+                      className="form-control"
+                      name="productImages"
+                      onChange={handleFileChange}
+                      multiple
+                    />
+                  </div>
+                  <button type="submit" className="btn btn-primary me-2">
+                    Add
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-danger"
+                    onClick={() => {
+                      setAddProductCard(false);
+                    }}
+                  >
+                    Close
+                  </button>
+                </form>
               </div>
-              <div className="mb-3">
-                {/* Price */}
-                <label htmlFor="priceInput" className="form-label">
-                  Price
-                </label>
-                <input
-                  type="number"
-                  className="form-control"
-                  name="price"
-                  placeholder="Enter Price"
-                  value={productData.price}
-                  onChange={handleChanges}
-                />
+            </div>
+          )}
+
+          {notFound ? (
+            <div>
+              {/* Table */}
+              <div>
+                <div className="m-2">
+                  <table className="table table-hover">
+                    <thead>
+                      <tr>
+                        <th scope="col">#id</th>
+                        {/* <th scope="col" style={{ width: "100%" }}>
+                      Your Category
+                    </th> */}
+                        <th scope="col">Name</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">CategoryId</th>
+                        <th scope="col">Price</th>
+                        <th scope="col" style={{ width: "100%" }}>
+                          Images
+                        </th>
+                        <th scope="col">Update</th>
+                        <th scope="col">Delete</th>
+                      </tr>
+                      <td
+                        colSpan={8}
+                        className="sticky-top bg-light"
+                        style={{ textAlign: "center", verticalAlign: "middle" }}
+                      >
+                        <button
+                          type="button"
+                          className="btn btn-outline-dark"
+                          onClick={onClickAddProduct}
+                        >
+                          Add Products
+                        </button>
+                      </td>
+                    </thead>
+                    <tbody>
+                      {userProducts.map((item) => {
+                        const {
+                          id,
+                          name,
+                          description,
+                          categoryId,
+                          price,
+                          images,
+                        } = item;
+                        const img = JSON.parse(images);
+                        return (
+                          <tr key={id}>
+                            <th scope="row">{id}</th>
+                            <td style={{ fontSize: "12px" }}>{name}</td>
+                            <td style={{ fontSize: "12px" }}>{description}</td>
+                            <td>{categoryId}</td>
+                            <td>{price}</td>
+                            {/* <td>{images}</td> */}
+                            {/* <td>
+                          <div className="img-container">
+                            {img.map((item) => {
+                              return (
+                                <div className="custom-img" key={item}>
+                                  <img
+                                    src={imageBaseurl + item}
+                                    className="card-img-top"
+                                    alt="Product Image"
+                                  />
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </td> */}
+                            <td>
+                              <div className="img-container">
+                                {img.map((item) => {
+                                  return (
+                                    <div
+                                      className="custom-img-container"
+                                      key={item}
+                                    >
+                                      <div className="custom-img">
+                                        <button
+                                          className="cancel-button"
+                                          onClick={() => handleCancel(item, id)}
+                                        >
+                                          &#x2716;{" "}
+                                          {/* Unicode character for 'multiplication x' symbol */}
+                                        </button>
+                                        <img
+                                          src={imageBaseurl + item}
+                                          className="card-img-top"
+                                          alt="Product Image"
+                                        />
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </td>
+                            <td>
+                              <button
+                                type="button"
+                                className="btn btn-outline-primary"
+                                onClick={() => updateProduct(id)}
+                              >
+                                Update
+                              </button>
+                            </td>
+                            <td>
+                              <button
+                                type="button"
+                                className="btn btn-outline-danger"
+                                onClick={() => deleteProduct(id)}
+                              >
+                                Delete
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
               </div>
-              <div className="mb-3">
-                {/* Images */}
-                <label htmlFor="imagesInput" className="form-label">
-                  Images
-                </label>
-                <input
-                  type="file"
-                  className="form-control"
-                  name="productImages"
-                  onChange={handleFileChange}
-                  multiple
-                />
-              </div>
-              <button type="submit" className="btn btn-primary me-2">
-                Add
-              </button>
+              {/* ScrolToTop */}
               <button
                 type="button"
-                className="btn btn-danger"
-                onClick={() => {
-                  setAddProductCard(false);
-                }}
+                className="btn btn-dark top-arrow-button"
+                onClick={scrollToTop}
               >
-                Close
+                Go to top
               </button>
-            </form>
-          </div>
+            </div>
+          ) : (
+            <h1>Not Found</h1>
+          )}
         </div>
+      ) : (
+        <h1>Authentication Failed</h1>
       )}
-
-      {/* Table */}
-      <div>
-        <div className="m-2">
-          <table className="table table-hover">
-            <thead>
-              <tr>
-                <th scope="col">#id</th>
-                {/* <th scope="col" style={{ width: "100%" }}>
-                  Your Category
-                </th> */}
-                <th scope="col">Name</th>
-                <th scope="col">Description</th>
-                <th scope="col">CategoryId</th>
-                <th scope="col">Price</th>
-                <th scope="col" style={{ width: "100%" }}>
-                  Images
-                </th>
-                <th scope="col">Update</th>
-                <th scope="col">Delete</th>
-              </tr>
-              <td
-                colSpan={8}
-                className="sticky-top bg-light"
-                style={{ textAlign: "center", verticalAlign: "middle" }}
-              >
-                <button
-                  type="button"
-                  className="btn btn-outline-dark"
-                  onClick={onClickAddProduct}
-                >
-                  Add Products
-                </button>
-              </td>
-            </thead>
-            <tbody>
-              {userProducts.map((item) => {
-                const { id, name, description, categoryId, price, images } =
-                  item;
-
-                const img = JSON.parse(images);
-                console.log(categoryId);
-
-                return (
-                  <tr key={id}>
-                    <th scope="row">{id}</th>
-                    <td style={{ fontSize: "12px" }}>{name}</td>
-                    <td style={{ fontSize: "12px" }}>{description}</td>
-                    <td>{categoryId}</td>
-                    <td>{price}</td>
-                    {/* <td>{images}</td> */}
-                    {/* <td>
-                      <div className="img-container">
-                        {img.map((item) => {
-                          return (
-                            <div className="custom-img" key={item}>
-                              <img
-                                src={imageBaseurl + item}
-                                className="card-img-top"
-                                alt="Product Image"
-                              />
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </td> */}
-                    <td>
-                      <div className="img-container">
-                        {img.map((item) => {
-                          return (
-                            <div className="custom-img-container" key={item}>
-                              <div className="custom-img">
-                                <button
-                                  className="cancel-button"
-                                  onClick={() => handleCancel(item, id)}
-                                >
-                                  &#x2716;{" "}
-                                  {/* Unicode character for 'multiplication x' symbol */}
-                                </button>
-                                <img
-                                  src={imageBaseurl + item}
-                                  className="card-img-top"
-                                  alt="Product Image"
-                                />
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </td>
-                    <td>
-                      <button
-                        type="button"
-                        className="btn btn-outline-primary"
-                        onClick={() => updateProduct(id)}
-                      >
-                        Update
-                      </button>
-                    </td>
-                    <td>
-                      <button
-                        type="button"
-                        className="btn btn-outline-danger"
-                        onClick={() => deleteProduct(id)}
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <button
-        type="button"
-        className="btn btn-dark top-arrow-button"
-        onClick={scrollToTop}
-      >
-        Go to top
-      </button>
-    </>
+    </div>
   );
 };
 

@@ -9,6 +9,7 @@ import { UserContext } from "../../../context/UserContext";
 const SearchPage = () => {
   const [products, setProducts] = useState([]);
   const { str } = useContext(UserContext);
+  const { filter } = useContext(UserContext);
   const [notFound, setNotFound] = useState(false);
 
   const token = localStorage.getItem("auth");
@@ -67,13 +68,34 @@ const SearchPage = () => {
     }
   };
 
+  const fetchFilterProducts = async () => {
+    try {
+      const response = await axios.get(`${API}/filterProduct/${filter}`, {
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.status == 200) {
+        // console.log(response.data.result);
+        setProducts(response.data.result);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
+    if (filter != "") {
+      fetchFilterProducts();
+    }
     if (str == "") {
       fetchProducts();
       setNotFound(true);
     }
+
     fetchSearchProducts();
-  }, [str]);
+  }, [str, filter]);
 
   const imageBaseurl = "http://localhost:4000/api/public/";
 
