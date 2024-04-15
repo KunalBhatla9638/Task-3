@@ -394,16 +394,17 @@ const deleteParticularImage = async (req, res) => {
 const fetchSearchAccordingFilter = async (req, res) => {
   try {
     const filter = req.params.filter;
+
     const result = await sequelize.query(
       `
-    select DISTINCT * from categories 
+    select * from categories 
     RIGHT JOIN products 
     on categories.id = products.categoryId 
-    WHERE categories.categoryname = ?;
+    WHERE categories.categoryname = "${filter}";
     `,
       {
         type: QueryTypes.SELECT,
-        replacements: [filter],
+        // replacements: [filter],
       }
     );
 

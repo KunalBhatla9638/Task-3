@@ -13,6 +13,7 @@ const {
   welcome,
   addUser,
   loginUser,
+  getUserProfile,
 } = require("../controllers/UserController");
 
 //Category Controllers
@@ -51,6 +52,7 @@ router.post("/role", AddRole);
 //User common Route
 router.post("/addUser", uploadPhoto.single("profileImage"), addUser);
 router.post("/login", loginUser);
+router.get("/getProfile", verifyToken, getUserProfile);
 
 //Category Route
 router.get("/list", verifyToken, listCategory);
@@ -87,6 +89,7 @@ router.post(
   emailHandler
 );
 
+//Cron Demo
 // (async () => {
 //   try {
 //     await cronMail();

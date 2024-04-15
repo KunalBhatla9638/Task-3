@@ -48,6 +48,7 @@ const ProductPage = () => {
     if (!token) {
       navigate("/login");
     }
+    document.title = "Product Page";
   }, [token, navigate]);
 
   const fetchProducts = async () => {
@@ -101,7 +102,6 @@ const ProductPage = () => {
     }
   };
 
-  console.log(str);
   useEffect(() => {
     if (str == "") {
       fetchProducts();
@@ -516,7 +516,7 @@ const ProductPage = () => {
                       </td>
                     </thead>
                     <tbody>
-                      {userProducts.map((item) => {
+                      {userProducts.map((item, idx) => {
                         const {
                           id,
                           name,
@@ -527,7 +527,7 @@ const ProductPage = () => {
                         } = item;
                         const img = JSON.parse(images);
                         return (
-                          <tr key={id}>
+                          <tr key={idx}>
                             <th scope="row">{id}</th>
                             <td style={{ fontSize: "12px" }}>{name}</td>
                             <td style={{ fontSize: "12px" }}>{description}</td>

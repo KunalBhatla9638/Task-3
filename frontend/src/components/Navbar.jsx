@@ -11,6 +11,7 @@ const Navbar = () => {
   const { setStr } = useContext(UserContext);
   const navigate = useNavigate();
   const [allCategory, setAllCategory] = useState([]);
+  const [userProfile, setUserProfile] = useState("");
 
   useEffect(() => {
     if (!token) {
@@ -34,9 +35,30 @@ const Navbar = () => {
       console.log(err);
     }
   };
+
+  // setUserProfile("profileImagePlaceholder.png");
+
+  const getUserProfile = async () => {
+    try {
+      const response = await axios.get(API + "/getProfile", {
+        headers: {
+          authorization: `asdf ${token}`,
+        },
+      });
+      if (response.status == 200) {
+        setUserProfile(response.data.profile_pic);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   useEffect(() => {
     if (allCategory == "") {
       getAllCategory();
+    }
+    if (userProfile == "") {
+      getUserProfile();
     }
   });
 
@@ -45,6 +67,8 @@ const Navbar = () => {
   const onFilterClick = (e) => {
     setFilter(e.target.value);
   };
+
+  const imageBaseurl = "http://localhost:4000/api/public/";
 
   return (
     <nav
@@ -104,6 +128,23 @@ const Navbar = () => {
                   );
                 })}
               </select>
+            </div>
+
+            {/* <div style={{ "border-radius": "50%", overflow: "hidden" }}>
+              <img
+                src="src/assets/react.svg"
+                style={{ width: "100%", height: "35px", display: "block" }}
+              />
+            </div> */}
+            <div
+              class="rounded-circle overflow-hidden"
+              style={{ width: "7rem", height: "40px", marginLeft: "10px" }}
+            >
+              <img
+                src={imageBaseurl + userProfile}
+                class="img-fluid"
+                // alt="src/assets/profileImagePlaceholder.png"
+              />
             </div>
           </form>
         </div>

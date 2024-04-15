@@ -181,8 +181,19 @@ const loginUser = async (req, res) => {
   }
 };
 
+const getUserProfile = async (req, res) => {
+  // console.log(req.obj);
+  const { profile_pic } = req.obj;
+  if (!profile_pic) {
+    res.status(404).json({ error: "Profile image not found" });
+  }
+
+  res.status(200).json({ status: "success", profile_pic });
+};
+
 module.exports = {
   welcome,
   addUser,
   loginUser,
+  getUserProfile,
 };

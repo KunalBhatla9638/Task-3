@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./HomePage.css";
 import axios from "axios";
 import BASEURL from "../../axios";
@@ -6,6 +6,9 @@ import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
 const HomePage = () => {
+  useEffect(() => {
+    document.title = "Registration Page";
+  });
   const [formData, setFormData] = useState({
     firstname: "",
     lastname: "",

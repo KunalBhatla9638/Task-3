@@ -1,10 +1,13 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import API from "../../axios";
 
 const LoginPage = () => {
+  useEffect(() => {
+    document.title = "Login Page";
+  });
   const [formData, setFormData] = useState({
     email: "",
     password: "",

@@ -18,6 +18,7 @@ const SearchPage = () => {
     if (!token) {
       navigate("/login");
     }
+    document.title = "Home Page";
   }, [token, navigate]);
 
   const fetchProducts = async () => {
@@ -76,8 +77,8 @@ const SearchPage = () => {
         },
       });
 
-      if (response.status == 200) {
-        // console.log(response.data.result);
+      if (response.data.status == "success") {
+        console.log(response.data.result);
         setProducts(response.data.result);
       }
     } catch (error) {
@@ -89,12 +90,13 @@ const SearchPage = () => {
     if (filter != "") {
       fetchFilterProducts();
     }
-    if (str == "") {
+    if (str != "") {
+      fetchSearchProducts();
+    }
+    if (filter == "" && str == "") {
       fetchProducts();
       setNotFound(true);
     }
-
-    fetchSearchProducts();
   }, [str, filter]);
 
   const imageBaseurl = "http://localhost:4000/api/public/";

@@ -13,6 +13,7 @@ const SupportPage = () => {
     if (!token) {
       navigate("/login");
     }
+    document.title = "Support Page";
   }, [token, navigate]);
 
   const [emailData, setEmailData] = useState({

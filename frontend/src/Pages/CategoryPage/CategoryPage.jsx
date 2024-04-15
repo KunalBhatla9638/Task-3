@@ -18,6 +18,7 @@ const CategoryPage = () => {
     if (!token) {
       navigate("/login");
     }
+    document.title = "Category Page";
   }, [token, navigate]);
 
   const fetchCategory = async () => {
