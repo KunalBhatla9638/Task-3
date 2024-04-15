@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 11, 2024 at 08:33 PM
+-- Generation Time: Apr 15, 2024 at 03:35 AM
 -- Server version: 10.4.27-MariaDB
 -- PHP Version: 8.2.0
 
@@ -42,7 +42,26 @@ INSERT INTO `categories` (`id`, `categoryname`, `createdBy`) VALUES
 (11, 'Books', 4),
 (12, 'gaming keyboard', 21),
 (13, 'mouse', 21),
-(15, 'test', 21);
+(15, 'test', 21),
+(21, 'demo', 21),
+(23, 'shoes', 7);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `email`
+--
+
+CREATE TABLE `email` (
+  `countemail` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+
+--
+-- Dumping data for table `email`
+--
+
+INSERT INTO `email` (`countemail`) VALUES
+(9);
 
 -- --------------------------------------------------------
 
@@ -61,14 +80,16 @@ CREATE TABLE `productphotos` (
 --
 
 INSERT INTO `productphotos` (`id`, `productId`, `photo_name`) VALUES
-(10, 1, '[\"img5.jpg\",\"img.jpg\"]'),
-(11, 2, '[\"img2.jpg\",\"img4.jpg\"]'),
-(12, 3, '[\"img4.jpg\"]'),
-(13, 4, '[\"img2.jpg\",\"img3.jpg\",\"img4.jpg\"]'),
-(14, 5, '[\"img.jpg\",\"img2.jpg\"]'),
 (15, 6, '[\"img6.jpg\"]'),
-(16, 7, '[\"img7.jpg\"]'),
-(17, 8, '[\"img7.jpg\",\"img8.jpg\"]');
+(78, 69, '[\"mouse1.jpg\"]'),
+(79, 70, '[\"mouse2.jpg\"]'),
+(80, 71, '[\"img.jpg\",\"img2.jpg\",\"img3.jpg\",\"img4.jpg\",\"keyboard2.jpg\"]'),
+(81, 72, '[\"img.jpg\",\"img3.jpg\",\"img4.jpg\",\"keyboard2.jpg\",\"mouse1.jpg\"]'),
+(82, 73, '[\"img4.jpg\",\"img7.jpg\",\"img8.jpg\"]'),
+(83, 74, '[\"airbuds.jpg\",\"img2.jpg\",\"img3.jpg\",\"img4.jpg\",\"img8.jpg\",\"keyboard2.jpg\"]'),
+(84, 75, '[\"airbuds.jpg\",\"img.jpg\",\"img2.jpg\",\"img3.jpg\",\"img4.jpg\",\"img5.jpg\",\"img6.jpg\",\"img7.jpg\",\"img8.jpg\",\"keyboard2.jpg\",\"mouse1.jpg\",\"mouse2.jpg\"]'),
+(87, 78, '[\"img6.jpg\",\"img7.jpg\",\"img8.jpg\"]'),
+(88, 79, '[\"shoe1.jpg\"]');
 
 -- --------------------------------------------------------
 
@@ -90,14 +111,16 @@ CREATE TABLE `products` (
 --
 
 INSERT INTO `products` (`id`, `name`, `description`, `categoryId`, `price`, `images`) VALUES
-(1, 'Daikin 0.8 Ton 3 Star, Fixed Speed Split AC (Copper, PM 2.5 Filter, 2022 Model, FTL28U, White)', 'Split AC with non-inverter compressor: Power chill operation to ensure quick cooling\nCapacity 0.8 Ton: Suitable for small sized rooms (up to 100 sq.ft)\n3 Star: Energy efficiency', 12, '4495.69', '[\"img5.jpg\",\"img.jpg\"]'),
-(2, 'STRIFF Mpad Mouse Mat 230X190X3mm Gaming Mouse Pad, Non-Slip Rubber Base, Waterproof Surface, Premium-Textured, Compatible with Laser and Optical Mice(Universe Black)', '9.4 Inches X 7.9 Inches) 240mm x 200mm x 2mm Size: This mouse pad is ideal for Gamers, Graphic Designers, Students, or anyone using mouse for long sessions. This helps to improve the gaming experience for gamers or the work efficiency in the office.', 12, '1500.00', '[\"img2.jpg\",\"img4.jpg\"]'),
-(3, 'GIZGA essentials (35cm x 25cm Extended Gaming Mouse Pad, Laptop Desk Mat, Computer Mouse Pad with Smooth Mouse Control, Mercerized Surface, Antifray Stitched Embroidery Edges, Anti-Slip Rubber Base', 'ULTRA-SMOOTH SURFACE: Gizga Essentials Mouse pad is made of Premium-textured and Mercerized surface that the mouse glides over nicely, it is optimized for fast movement while maintaining excellent speed and control, great for daily work or gaming.', 12, '1000.00', '[\"img4.jpg\"]'),
-(4, 'V-CUBE Designs Desk Mat|90X45cm|2.4mm Thick(Padded)|Premium Vegan Leather Laptop Mat/Extended Mouse Pad/Stitched, Reversible, Sturdy Deskspread with High Tear/Peel Strength|Anti-Slip,Splash-Proof|Blue', 'BUILT - V-CUBE DESIGNS Premium 90cm X 45cm Desk Mat / Laptop Mat is an excellent desk accessory made with High Quality Vegan Leather with High Tear and Peel Strength. Stitched around the Borders of the Mat for an enhanced look. The 2.4mm Thickness increases the comfort while using the Mat while maintaining stability. This Handmade Extended Mouse Pad is reversible with Vegan Leather and Same Colour (Navy Blue) on both sides.', 12, '2100.00', '[\"img2.jpg\",\"img3.jpg\",\"img4.jpg\"]'),
-(5, 'Logitech G213 Prodigy USB Gaming Keyboard, LIGHTSYNC RGB Backlit Keys, Spill-Resistant, Customizable Keys, Dedicated Multi-Media Keys - Black', 'Brilliant Color Spectrum Illumination Personalize five individual lighting zones from a spectrum of over 16.8 million colors. Change colors to match your setup, specific games, or to showcase your favorite colors. Synchronize lighting effects with other Logitech G devices using Logitech Gaming S', 12, '3100.00', '[\"img.jpg\",\"img2.jpg\"]'),
 (6, 'Steelbird SBH-34 Jai Shree Ram Reflective ISI Certified Full Face Graphic Helmet for Men and Women with Inner Smoke Sun Shield', 'High Impact Resistant Thermoplastic shell\nBreathable Padding with Neck Protector and Extra Comfort for long Drives\nQuick Release Micro-Metric Buckle meeting European Standards.\nNight Reflective Full Face Helmet\nAnti Scratch Coated Visor Quick Release Visor mechanism Kit', 11, '700.00', '[\"img6.jpg\"]'),
-(7, 'LG 7 Kg 5 Star Inverter Touch panel Fully-Automatic Front Load Washing Machine with In-Built Heater (FHM1207SDM, Middle Black, Steam for Hygiene Wash)', 'Fully-automatic front load washing machine with Hygiene Steam/direct-drive technology: Best Wash Quality, Energy and Water efficient\nCapacity - 7 Kg: Suitable for 3 – 4 members\nEnergy Rating 5 Star: Best in class efficiency | Energy consumption – 0.0064* KWh/kg/cycle & Water Consumption: 13.14 L/Kg/Cycle (Please refer BEE label for more information)', 12, '21000.00', '[\"img7.jpg\"]'),
-(8, 'Whirlpool 7 Kg 5 Star Royal Fully-Automatic Top Loading Washing Machine (WHITEMAGIC ROYAL 7.0 GENX, Grey, Hard Water Wash, ZPF Technology)', 'Fully-automatic top load washing machine : Affordable with best wash quality with Hard Water Wash\nCapacity:7 kg (Suitable for Small to Medium sized family)\nEnergy star rating 5 Star: Best in class efficiency\nManufacturer Warranty :2 years on product, 5 years on motor\nMotor : 740 RPM ; Higher spin speed helps in faster drying', 12, '15000.00', '[\"img7.jpg\",\"img8.jpg\"]');
+(69, 'ZEBRONICS New Launch Uzi High Precision Wired Gaming Mouse with 4 Buttons, Rainbow LED Lights, DPI Switch with', 'Ergonomic design: Crafted for both gaming and work, the ZEB-Uzi is a lightweight wired mouse designed with ergonomics in mind, ensuring a usage experience free from fatigue.', 13, '555.00', '[\"img5.jpg\",\"img6.jpg\",\"img7.jpg\",\"keyboard2.jpg\",\"mouse1.jpg\",\"mouse2.jpg\"]'),
+(70, 'Razer DeathAdder Essential White Edition - 6400 DPI Ergonomic Wired Gaming Mouse - RZ01-03850200-R3M1', 'High-Precision 6,400 DPI Optical Sensor: Offers on-the-fly sensitivity adjustment through dedicated DPI buttons (reprogrammable) for gaming and creative work', 13, '2100.00', '[\"mouse1.jpg\",\"mouse2.jpg\",\"mouse2.jpg\"]'),
+(71, ' Redragon K596 PRO RGB Mechanical Gaming Keyboard, 5.0 BT/2.4 Ghz/Wired Three Modes, 87 Keys TKL Compact', 'Wireless and Wired Mode - Featuring dual wired and wireless modes. Easy wireless setup with an included dongle that allows for low latency connection without interference ', 12, '5000.00', '[\"img.jpg\",\"img2.jpg\",\"img3.jpg\",\"keyboard2.jpg\"]'),
+(72, 'SteelSeries Store Apex 5 Hybrid Mechanical Gaming Keyboard, Per-Key RGB Illumination, Aircraft Grade Aluminum Alloy Frame, OLED Smart Display (Hybrid Blue Switch, USB)', 'Hybrid mechanical gaming switches – The tactile click of a blue mechanical switch plus a smooth membrane OLED smart display – Customize with gifs, game info, discord messages, and more.', 12, '4000.00', '[\"img2.jpg\",\"img3.jpg\",\"img7.jpg\",\"keyboard2.jpg\"]'),
+(73, 'iQOO Z6 Lite 5G (Stellar Green, 6GB RAM, 128GB Storage) with Charger | Qualcomm Snapdragon 4 Gen 1 Processor | 120Hz FHD+ Display | Travel Adaptor Included in The Box', 'iQOO Z6 Lite 5G (Stellar Green, 6GB RAM, 128GB Storage) with Charger | Qualcomm Snapdragon 4 Gen 1 Processor | 120Hz FHD+ Display | Travel Adaptor Included in The Box', 13, '4000.00', '[\"img3.jpg\",\"img8.jpg\",\"airbuds.jpg\",\"img.jpg\",\"img2.jpg\"]'),
+(74, 'testing12 changed this shit again', 'Kunal changed this also', 13, '4495.69', '[\"img2.jpg\",\"img8.jpg\"]'),
+(75, 'demo', 'DEMO', 15, '4495.69', '[\"airbuds.jpg\",\"img3.jpg\",\"img4.jpg\",\"keyboard2.jpg\",\"mouse1.jpg\",\"mouse2.jpg\"]'),
+(78, 'testing 22', 'testing', 21, '300.00', '[\"img7.jpg\",\"img8.jpg\"]'),
+(79, 'OFF LIMITS STUSSYY (Memory TECH) Running Shoes for Men', 'Phylon TPR sole provides traction and grip over varied surfaces The upper has a PU base and a super soft lining for added', 23, '1100.00', '[\"shoe1.jpg\"]');
 
 -- --------------------------------------------------------
 
@@ -208,19 +231,19 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `categories`
 --
 ALTER TABLE `categories`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- AUTO_INCREMENT for table `productphotos`
 --
 ALTER TABLE `productphotos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=89;
 
 --
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=80;
 
 --
 -- AUTO_INCREMENT for table `roles`

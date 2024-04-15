@@ -81,7 +81,9 @@ const HomePage = () => {
         profileImage: null,
       });
       const errorMsg = err.response.data.error;
-      if (code == 409 || 500 || 400) {
+      toast.error(errorMsg);
+      console.log(errorMsg);
+      if (code == 409 || code == 500 || code == 400) {
         console.log(errorMsg);
         setFormData({
           firstname: "",
@@ -92,7 +94,6 @@ const HomePage = () => {
           hobbies: "",
           profileImage: null,
         });
-        toast.error(errorMsg);
       }
     }
   };
