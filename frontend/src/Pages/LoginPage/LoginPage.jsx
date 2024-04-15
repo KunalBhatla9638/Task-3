@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import API from "../../axios";
+import { UserContext } from "../../../context/UserContext";
 
 const LoginPage = () => {
   useEffect(() => {
@@ -21,7 +22,7 @@ const LoginPage = () => {
     });
   };
 
-  //   const token = localStorage.getItem("auth");
+  const { setUserId } = useContext(UserContext);
 
   const navigate = useNavigate();
   const handleSubmit = async (event) => {
@@ -35,6 +36,7 @@ const LoginPage = () => {
       if (code == 200) {
         console.log(successMsg);
         toast.success(successMsg);
+        localStorage.setItem("userID", response.data.id);
         localStorage.setItem("auth", response.data.authToken);
         navigate("/home");
       }

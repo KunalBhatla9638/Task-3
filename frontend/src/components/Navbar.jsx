@@ -8,9 +8,8 @@ import API from "../axios";
 
 const Navbar = () => {
   const token = localStorage.getItem("auth");
-  const { setStr } = useContext(UserContext);
+  const { setStr, allCategory, setAllCategory } = useContext(UserContext);
   const navigate = useNavigate();
-  const [allCategory, setAllCategory] = useState([]);
   const [userProfile, setUserProfile] = useState("");
 
   useEffect(() => {
@@ -155,6 +154,7 @@ const Navbar = () => {
             const result = confirm("Do you want to logout for sure..?");
             if (result) {
               localStorage.removeItem("auth");
+              localStorage.removeItem("userID");
               navigate("/login");
             }
           }}

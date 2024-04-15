@@ -8,9 +8,10 @@ import { UserContext } from "../../../context/UserContext";
 
 const ProductPage = () => {
   const token = localStorage.getItem("auth");
+  const userID = localStorage.getItem("userID");
   const navigate = useNavigate();
   const [id, setId] = useState(-1);
-  const { str } = useContext(UserContext);
+  const { str, setAllCategory } = useContext(UserContext);
 
   const [loader, setLoader] = useState(false);
   const [updateProductCard, setUpdateProductCard] = useState(false);
@@ -102,11 +103,31 @@ const ProductPage = () => {
     }
   };
 
+  console.log(userID);
+
+  const getAllUsersCategories = async () => {
+    try {
+      const response = await axios(API + `/getUserCategories/${userID}`, {
+        headers: {
+          authorization: `afdonf ${token}`,
+        },
+      });
+
+      if (response.status == 200) {
+        console.log(response.data.result);
+        setAllCategory(response.data.result);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   useEffect(() => {
     if (str == "") {
       fetchProducts();
       setNotFound(true);
     }
+    getAllUsersCategories();
     fetchSearchProducts();
   }, [str]);
 

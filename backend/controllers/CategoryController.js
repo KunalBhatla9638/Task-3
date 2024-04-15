@@ -249,10 +249,41 @@ const getCategory = async (req, res) => {
   }
 };
 
+const getParticularUsersCategory = async (req, res) => {
+  try {
+    const id = req.params.userId;
+    const result = await sequelize.query(
+      `
+    select DISTINCT categories.categoryname from categories 
+    RIGHT JOIN products on categories.id = products.categoryId
+    LEFT JOIN users on users.id = categories.createdBy
+    WHERE users.id = ?;
+    `,
+      {
+        type: QueryTypes.SELECT,
+        replacements: [id],
+      }
+    );
+
+    if (!result) {
+      return res
+        .status(400)
+        .json({ error: "Error while fetching the data from the server" });
+    }
+
+    res.status(200).json({ status: "success", result });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ error: "Internal server error ", msg: error.message });
+  }
+};
+
 module.exports = {
   listCategory,
   addCategory,
   updateCategory,
   deleteCategory,
   getCategory,
+  getParticularUsersCategory,
 };

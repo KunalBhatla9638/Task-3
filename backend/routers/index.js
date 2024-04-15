@@ -23,6 +23,7 @@ const {
   updateCategory,
   deleteCategory,
   getCategory,
+  getParticularUsersCategory,
 } = require("../controllers/CategoryController");
 
 //Products Controllers
@@ -61,6 +62,11 @@ router.post("/addCategory", verifyToken, addCategory);
 router.patch("/updateCategory/:id", verifyToken, updateCategory);
 router.delete("/deleteCategory/:id", verifyToken, deleteCategory);
 router.get("/getCategories", verifyToken, getCategory);
+router.get(
+  "/getUserCategories/:userId",
+  verifyToken,
+  getParticularUsersCategory
+);
 
 // Products Route
 router.get("/products", verifyToken, listProducts);
